@@ -35,6 +35,7 @@ class ClientNetwork:
         self.PORT = port
         #  The key allows customers to connect with a character, this is how it stores positions
         self.KEY = key
+        self.spawn_pos = None
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.connect()
 
@@ -48,7 +49,9 @@ class ClientNetwork:
                 #  When the server returns "no", it means a user is already logged in
                 raise UserAlreadyConnected(self.KEY)
             else:
-                self.KEY = server_respond
+                self.KEY = server_respond['key']
+                self.spawn_pos = server_respond['pos']
+
         #  Exception when an error with the server appears, for example if the server is not started
         except EOFError:
             raise ServerNoFound(self.HOST, self.PORT)
@@ -79,16 +82,10 @@ class ClientNetwork:
 
 
 if __name__ == "__main__":
-    conn = ClientNetwork("192.168.1.69", 3010)
-    x = 0
-    y = 50
+    conn = ClientNetwork("192.168.1.69", 3010, "8b47e4")
+    x = conn.spawn_pos[0]
+    y = conn.spawn_pos[1]
     d = 1
     print(conn.KEY)
     while True:
-        x += d
-        if x > 500:
-            d = -0.01
-        elif x < 0:
-            d = 0.01
-
-        print(f"\r{conn.send_attribute(pos=(x, y))[conn.KEY]}", end="")
+        print(f'\r{conn.send_attribute((x, y))}', end='')

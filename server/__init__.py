@@ -1,29 +1,49 @@
 import random
 import socket
+import pickle
 import secrets
 import requests
+#  world = {'test': {'pos': (x, y), 'online': bool, 'stat': 'Walk'}}
+world = {}
+LEN_TOTAL_PRINT = 52
 
-world = {'ae4b3c': {'pos': (255, 258), 'online': False, 'stat': 'Walk'}}
-len_total_print = 46
 
+class ClientConn:
+    def __init__(self, client_socket: socket.socket, addr):
+        self.socket = client_socket
+        self.address_ip, self.port = addr
 
-class ServerNetwork:
-    def __init__(self, host, port):
-        self.HOST = host
-        self.PORT = port
-        self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server_socket.bind((self.HOST, self.PORT))
-        self.start()
+        access = True
+        #  The client sent his key, we check if he has a key valid or not
+        client_response = pickle.loads(client_socket.recv(1024))
+        if client_response in world.keys():
+            #  User already connected, so we refuse the connection
+            if world[client_response]['online']:
+                access = False
+                custom_print(f'[CONNECTION] Refused', f'{self.address_ip}:{self.port}')
+            else:
+                self.KEY = client_response
+                self.pos = world[client_response]['pos']
+                custom_print(f'[CONNECTION] With the Key {self.KEY}', f'{self.address_ip}:{self.port}')
+        else:
+            #  No valid key, we generate a new login key
+            self.KEY = generate_key()
+            self.pos = generate_pos()
+            custom_print(f'[CREATE] a new key {self.KEY}', f'{self.address_ip}:{self.port}')
 
-    def start(self):
-        self.server_socket.listen()
+        self.socket.sendall(pickle.dumps({'key': self.KEY, 'pos': self.pos} if access else 'no'))
 
-    def accept(self):
-        return self.server_socket.accept()
+    def send(self):
+        #  We want to send just user who are connected
+        data_to_send = {}
+        for key in world.keys():
+            if world[key]['online']:
+                data_to_send[key] = world[key]
 
+        self.socket.sendall(pickle.dumps(data_to_send))
 
 def custom_print(word1, word2):
-    n_space = len_total_print - (len(str(word1)) + len(str(word2)))
+    n_space = LEN_TOTAL_PRINT - (len(str(word1)) + len(str(word2)))
     print(f"{word1}{'.' * n_space}{word2}")
 
 
@@ -45,7 +65,7 @@ def check_key_format(key):
     return True
 
 
-def generate_key():
+def generate_key() -> str:
     key = secrets.token_hex(3)
     while key in world.keys():
         key = secrets.token_hex(3)

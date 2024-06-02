@@ -2,7 +2,8 @@ import pickle
 import socket
 import threading
 from configparser import ConfigParser
-from server import get_public_ip, get_local_ip, custom_print, len_total_print, world, check_key_format, generate_key, generate_pos
+from server import (get_public_ip, get_local_ip, custom_print, LEN_TOTAL_PRINT, world, check_key_format, generate_key,
+                    generate_pos, ClientConn)
 
 
 class NewServer:
@@ -42,44 +43,8 @@ class NewServer:
     @staticmethod
     def client_connection(client_socket, addr):
         #  Start of the connection with the client
-        address, port = addr
-        custom_print('[CONNECTION] Start With', address)
-        client_response = pickle.loads(client_socket.recv(1024))
-        #  The client sent his key, we check if he has a key valid or not (just the syntax)
-        if check_key_format(client_response):
-            if client_response in world.keys():
-                if world[client_response]['online']:
-                    server_response = 'no'
-                    custom_print('[CONNECTION] Refused With', address)
-                else:
-                    key = client_response
-                    pos = world[key]['pos']
-                    server_response = {'key': key, 'start pos': pos}
-            else:
-                key = generate_key()
-                pos = generate_pos()
-                server_response = {'key': key, 'start pos': pos}
-        else:
-            key = generate_key()
-            pos = generate_pos()
-            server_response = {'key': key, 'start pos': pos}
-            custom_print(f'[CREATE] a new key {key}', address)
-        """
-        if not check_key_format(key):
-            new_key = generate_key()
-            custom_print(f'[CHANGE KEY] {key if key else "None"} => {new_key}', address)
-            key = new_key
-            pos = generate_pos()
-            server_response = {'key': key, 'pos': pos}
-        elif key in world.keys():
-            server_response = 'no'
-            custom_print('[CONNECTION] Refused With', address)
-        else:
-            print('[LOGGED] With Key:')
-            server_response = {'key': key, 'pos': }
-        """
-        client_socket.sendall(pickle.dumps(server_response))
-        world[key] = {'online': True}
+        client = ClientConn(client_socket, addr)
+        world[client.KEY] = {'online': True, 'pos': client.pos}
         while True:
             try:
                 message = pickle.loads(client_socket.recv(1024))
@@ -88,21 +53,22 @@ class NewServer:
             except ConnectionResetError:
                 break
             for attribute in message.keys():
-                world[key][attribute] = message[attribute]
-            print(f'\r{world}', end="")
-            client_socket.sendall(pickle.dumps(world))
+                world[client.KEY][attribute] = message[attribute]
+            client.send()
 
-        client_socket.close()
-        world[key]['online'] = False
-        custom_print('[CONNECTION] End With', address)
-        print(world)
+        client.socket.close()
+        world[client.KEY]['online'] = False
+        custom_print('[CONNECTION] End With', f'{client.address_ip}:{client.port}')
+        custom_print('[WORLD]: ', world)
 
     def start(self):
         self.server_socket.listen()
-        print(f"{self.HOST}:{self.PORT}".center(len_total_print, "="))
+        print(f"{self.HOST}:{self.PORT}".center(LEN_TOTAL_PRINT, "="))
         while True:
             conn, addr = self.server_socket.accept()
+
             thread = threading.Thread(target=self.client_connection, args=(conn, addr))
+            custom_print('[CONNECTION] Start With', f'{addr[0]}:{addr[1]}')
             thread.start()
 
 
