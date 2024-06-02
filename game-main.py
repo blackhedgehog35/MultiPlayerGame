@@ -1,7 +1,11 @@
 import pygame
+from game import player
 pygame.init()
 
 screen = pygame.display.set_mode((1200, 800))
+screen.fill('white')
+
+player = player.Player(screen, "ae4c5b")
 
 running = True
 
