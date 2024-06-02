@@ -9,7 +9,7 @@ class Player(pygame.sprite.Sprite):
 
         self.screen = screen
         self.color = f"#{key}"
-        self.image = self.draw()
+        self.draw()
         self.rect = (0, 0)
 
     def input(self):
@@ -19,4 +19,4 @@ class Player(pygame.sprite.Sprite):
         pass
 
     def draw(self):
-        return pygame.draw.rect(self.screen, self.color, self.rect, width=50)
+        pygame.draw.rect(self.screen, self.color, self.rect, width=50)
