@@ -42,6 +42,7 @@ class ClientConn:
 
         self.socket.sendall(pickle.dumps(data_to_send))
 
+
 def custom_print(word1, word2):
     n_space = LEN_TOTAL_PRINT - (len(str(word1)) + len(str(word2)))
     print(f"{word1}{'.' * n_space}{word2}")
