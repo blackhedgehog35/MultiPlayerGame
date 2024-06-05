@@ -40,8 +40,8 @@ class Player(pygame.sprite.Sprite):
 
     def update(self, dt):
 
-        next_rect_x = self.rect.x + self.direction.x * self.speed * dt
-        next_rect_y = self.rect.y + self.direction.y * self.speed * dt
+        next_rect_x = self.rect.centerx + self.direction.x * self.speed * dt
+        next_rect_y = self.rect.centery + self.direction.y * self.speed * dt
 
         if next_rect_x >= 0 and next_rect_x <= self.screen.get_width():
             self.rect.x += self.direction.x * self.speed * dt
