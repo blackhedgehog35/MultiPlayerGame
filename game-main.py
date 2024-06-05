@@ -1,21 +1,36 @@
+import sys
 import pygame
 from game import player
-pygame.init()
 
-screen = pygame.display.set_mode((1200, 800))
 
-player = player.Player(screen, "ffffff")
+class Game:
+    FPS = 20
 
-running = True
+    def __init__(self):
+        pygame.init()  # Initialize pygame here
+        self.screen = pygame.display.set_mode((1100, 620))
+        self.clock = pygame.time.Clock()
+        self.sprite = player.Player(self.screen, 'ffffff', (0, 0))
 
-while running:
+    def run(self):
+        run = True
+        while run:
+            dt = self.clock.tick(self.FPS)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    run = False  # Set run to False to exit the loop
 
-    player.input()
-    player.draw()
-    pygame.display.flip()
+            if not run:
+                break  # Break the loop to prevent further drawing after quitting
 
-    for event in pygame.event.get():
+            self.screen.fill('green')
+            self.sprite.update(dt)
+            self.sprite.draw()
+            pygame.display.flip()
 
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            running = False
+        pygame.quit()  # Ensure pygame quits after the loop has exited
+        sys.exit()
+
+
+if __name__ == '__main__':
+    Game().run()
