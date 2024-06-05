@@ -6,7 +6,7 @@ from game import player
 
 
 class Game:
-    FPS = 20
+    FPS = 144
 
     def __init__(self, connection: game.client.ClientNetwork):
         self.conn = connection
@@ -27,7 +27,7 @@ class Game:
                 self.sprites[key] = game.player.Player(self.screen, key, server_game[key]['pos'])
             else:
                 if key != self.conn.KEY:
-                    self.sprites[key].set_attributs(server_game[key]['pos'])
+                    self.sprites[key].set_attribute(server_game[key]['pos'], "test")
 
         for sprite in self.sprites.values():
             sprite.update(dt)
@@ -48,5 +48,6 @@ class Game:
         pygame.quit()
         sys.exit()
 
+
 if __name__ == '__main__':
-    Game(game.client.ClientNetwork("192.168.1.69", 3010)).run()
+    Game(game.client.ClientNetwork("192.168.1.69", 3010, "7641d9")).run()
