@@ -11,13 +11,13 @@ class Game:
     def __init__(self, connection: game.client.ClientNetwork):
         self.conn = connection
         pygame.init()
-        self.screen = pygame.display.set_mode((1100, 620))
+        self.screen = pygame.display.set_mode((1100, 800))
         pygame.display.set_caption('')
         self.clock = pygame.time.Clock()
         self.sprites = {self.conn.KEY: player.Player(self.screen, self.conn.KEY, self.conn.spawn_pos)}
 
     def draw_bg(self):
-        self.screen.fill('#a4a4a4')
+        self.screen.fill('#5a5a5a')
 
     def update(self, dt, server_game):
         self.draw_bg()
@@ -50,4 +50,4 @@ class Game:
 
 
 if __name__ == '__main__':
-    Game(game.client.ClientNetwork("192.168.1.69", 3010, "7641d9")).run()
+    Game(game.client.ClientNetwork("86.253.205.36", 59161, "6c5f24")).run()

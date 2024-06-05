@@ -1,3 +1,2 @@
-requests
-pytz
-pygame
+pygame~=2.5.2
+miniupnpc~=2.2.7
