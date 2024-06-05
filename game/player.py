@@ -53,3 +53,4 @@ class Player(pygame.sprite.Sprite):
 
     def set_attribute(self, attribute, value):
         attribute = value
+
