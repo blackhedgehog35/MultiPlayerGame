@@ -34,7 +34,6 @@ class Player(pygame.sprite.Sprite):
         else:
             self.direction.y = 0
 
-        self.update(3)
 
     def update(self, dt):
 
