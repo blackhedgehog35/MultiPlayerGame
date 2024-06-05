@@ -1,21 +1,36 @@
+import sys
+
 import pygame
 from game import player
-pygame.init()
 
-screen = pygame.display.set_mode((1200, 800))
 
-player = player.Player(screen, "ffffff")
+class Game:
+    FPS = 20
 
-running = True
+    def __init__(self):
+        self.screen = pygame.display.set_mode((1100, 620))
+        self.clock = pygame.time.Clock()
+        self.sprite = player.Player(self.screen, 'ffffff')
+        pygame.init()
 
-while running:
+    def run(self):
+        run = True
+        while run:
+            dt = self.clock.tick(self.FPS)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    run = False
+            self.screen.fill('green')
+            self.sprite.move()
+            self.sprite.update()
+            self.sprite.draw()
 
-    player.input()
-    player.draw()
-    pygame.display.flip()
+            pygame.display.flip()
+        pygame.quit()
+        sys.exit()
 
-    for event in pygame.event.get():
 
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            running = False
+if __name__ == '__main__':
+    Game().run()
+
+
