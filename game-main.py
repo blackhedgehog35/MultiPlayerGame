@@ -9,8 +9,9 @@ class Game:
     def __init__(self):
         pygame.init()  # Initialize pygame here
         self.screen = pygame.display.set_mode((1100, 620))
+        pygame.display.set_caption('')
         self.clock = pygame.time.Clock()
-        self.sprite = player.Player(self.screen, 'ffffff', (0, 0))
+        self.sprites = [player.Player(self.screen, 'ffffff', (0, 0))]
 
     def run(self):
         run = True
@@ -18,17 +19,16 @@ class Game:
             dt = self.clock.tick(self.FPS)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    run = False  # Set run to False to exit the loop
-
-            if not run:
-                break  # Break the loop to prevent further drawing after quitting
+                    run = False
 
             self.screen.fill('green')
-            self.sprite.update(dt)
-            self.sprite.draw()
+            self.sprites[0].input()
+            for sprite in self.sprites:
+                sprite.update(dt)
+                sprite.draw()
             pygame.display.flip()
 
-        pygame.quit()  # Ensure pygame quits after the loop has exited
+        pygame.quit()
         sys.exit()
 
 
