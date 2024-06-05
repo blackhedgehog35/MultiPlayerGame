@@ -11,7 +11,8 @@ class UserAlreadyConnected(Exception):
         super().__init__(self.client_key)
 
     def __str__(self):
-        return f"An user is already connected and is playing with the [{self.client_key}] key, please, create a new key..."
+        return (f"An user is already connected and is playing with the [{self.client_key}] key, "
+                "please, create a new key...")
 
 
 class ServerNoFound(Exception):
@@ -26,10 +27,23 @@ class ServerNoFound(Exception):
         return f"The server does not respond, please, make you sure that the host address is {self.HOST}:{self.PORT}"
 
 
+class ServerClosed(Exception):
+    """This custom exception appears when the connection between the client and the server are stopped"""
+
+    def __init__(self, host, port):
+        self.HOST = host
+        self.PORT = port
+        super().__init__((self.HOST, self.PORT))
+
+    def __str__(self):
+        return f"Connection closed, the server {self.HOST}:{self.PORT} is shutdown"
+
+
 class ClientNetwork:
     """
     It is this class which will manage the connections between the server and the client, client part.
-    This class must be initialized in the init, after the connection is made, a key will be stored in the KEY variable"""
+    This class must be initialized in the init, after the connection is made, a key will be stored in the KEY variable.
+    """
     def __init__(self, host, port, key=""):
         self.HOST = host
         self.PORT = port
@@ -74,18 +88,26 @@ class ClientNetwork:
         #  This function will be the main function in the pygame loop to send information. We send the main attributes
         #  to the server, and it returns all the characters on the map as well as their position
         try:
+            pos = round(pos[0], 1), round(pos[1], 1)
             #  We send dictionaries
             self.client_socket.sendall(pickle.dumps({'pos': pos}))
             return pickle.loads(self.client_socket.recv(1024))
         except EOFError:
-            return "Connection closed, the server is shutdown"
+            raise ServerClosed(self.HOST, self.PORT)
+        except BrokenPipeError:
+            raise ServerClosed(self.HOST, self.PORT)
 
 
 if __name__ == "__main__":
-    conn = ClientNetwork("192.168.1.69", 3010, "8b47e4")
+    conn = ClientNetwork("192.168.1.69", 3010, 'b8630d')
     x = conn.spawn_pos[0]
     y = conn.spawn_pos[1]
     d = 1
     print(conn.KEY)
     while True:
         print(f'\r{conn.send_attribute((x, y))}', end='')
+        x += 10**(-2) * d
+        if x > 1200:
+            d = -1
+        elif x < 0:
+            d = 1
