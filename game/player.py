@@ -8,7 +8,7 @@ class Player(pygame.sprite.Sprite):
 
         self.screen = screen
         self.color = f"#{key}"
-        self.rect = pygame.Rect(60, 60, 10, 10)
+        self.rect = pygame.Rect(60, 60, 30, 30)
         self.rect.x = 0
         self.rect.y = 0
 
