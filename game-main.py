@@ -6,7 +6,7 @@ from game import player
 class Game:
     FPS = 20
 
-    def __init__(self):
+    def __init__(self, ):
         pygame.init()  # Initialize pygame here
         self.screen = pygame.display.set_mode((1100, 620))
         pygame.display.set_caption('')
@@ -16,7 +16,7 @@ class Game:
     def run(self):
         run = True
         while run:
-            dt = self.clock.tick(self.FPS)
+            dt = self.clock.tick(self.FPS) / 1000
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False
