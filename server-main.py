@@ -9,5 +9,4 @@ class ServerGUI:
 
 
 if __name__ == "__main__":
-    ServerGUI()
     Server().start()
