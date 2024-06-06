@@ -36,7 +36,7 @@ class Player(pygame.sprite.Sprite):
 
         if keys[pygame.K_z] and keys[pygame.K_s]:
             self.direction.y = 0
-        if keys[pygame.K_z]:
+        elif keys[pygame.K_z]:
             self.direction.y = -1
         elif keys[pygame.K_s]:
             self.direction.y = 1
@@ -49,13 +49,16 @@ class Player(pygame.sprite.Sprite):
         print(f'\r{self.direction}', end="              ")
 
     def update(self, dt):
-        next_rect_x = self.rect.centerx + self.direction.x * self.speed * dt
-        next_rect_y = self.rect.centery + self.direction.y * self.speed * dt
+        next_rect_x = self.pos.x + self.direction.x * self.speed * dt
+        next_rect_y = self.pos.y + self.direction.y * self.speed * dt
+
+        self.pos.x += self.direction.x * self.speed * dt
+        self.pos.y += self.direction.y * self.speed * dt
 
         if 0 <= next_rect_x <= self.screen.get_width():
-            self.rect.x += self.direction.x * self.speed * dt
+            self.rect.x = self.pos.x
         if 0 <= next_rect_y <= self.screen.get_height():
-            self.rect.y += self.direction.y * self.speed * dt
+            self.rect.y = self.pos.y
 
     def draw(self):
         pygame.draw.rect(self.screen, self.color, self.rect)
