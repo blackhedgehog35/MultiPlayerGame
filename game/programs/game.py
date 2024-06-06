@@ -7,10 +7,10 @@ import sprites
 class Game:
     FPS = 60
 
-    def __init__(self, connection: client.ClientNetwork):
+    def __init__(self, screen, connection: client.ClientNetwork):
         self.conn = connection
         pygame.init()
-        self.screen = pygame.display.set_mode((1100, 800))
+        self.screen = screen
         pygame.display.set_caption('')
         self.clock = pygame.time.Clock()
         self.sprites = {self.conn.KEY: sprites.Player(self.conn.KEY, self.conn.spawn_pos)}
@@ -42,9 +42,10 @@ class Game:
             dt = self.clock.tick(self.FPS) / 1000
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    run = False
-                elif event.type == pygame.K_UP:
-                    if event == pygame.K_ESCAPE:
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == pygame.KEYDOWN:
+                    if pygame.key.get_pressed()[pygame.K_a]:
                         run = False
 
             server_game = self.conn.send_attribute((self.sprites[self.conn.KEY].rect.x,
@@ -52,9 +53,6 @@ class Game:
             self.update(dt, server_game)
             pygame.display.flip()
 
-        pygame.quit()
-        sys.exit()
-
 
 if __name__ == '__main__':
-    Game(client.ClientNetwork("86.253.205.36", 39783)).run()
+    Game(self.screen, client.ClientNetwork("86.253.205.36", 39783)).run()
