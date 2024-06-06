@@ -1,13 +1,13 @@
 import sys
 import pygame
-import game.programs.client
-from game.programs import sprites
+import client
+import sprites
 
 
 class Game:
     FPS = 60
 
-    def __init__(self, connection: game.programs.client.ClientNetwork):
+    def __init__(self, connection: client.ClientNetwork):
         self.conn = connection
         pygame.init()
         self.screen = pygame.display.set_mode((1100, 800))
@@ -23,7 +23,7 @@ class Game:
         self.sprites[self.conn.KEY].input()
         for key in server_game.keys():
             if key not in self.sprites.keys():
-                self.sprites[key] = game.programs.sprites.Player(key, server_game[key]['pos'])
+                self.sprites[key] = sprites.Player(key, server_game[key]['pos'])
             else:
                 if key != self.conn.KEY:
                     self.sprites[key].set_attribute(server_game[key]['pos'])
@@ -57,4 +57,4 @@ class Game:
 
 
 if __name__ == '__main__':
-    Game(game.programs.client.ClientNetwork("86.253.205.36", 39783)).run()
+    Game(client.ClientNetwork("86.253.205.36", 39783)).run()

@@ -96,18 +96,3 @@ class ClientNetwork:
             raise ServerClosed(self.HOST, self.PORT)
         except BrokenPipeError:
             raise ServerClosed(self.HOST, self.PORT)
-
-
-if __name__ == "__main__":
-    conn = ClientNetwork("192.168.1.69", 3010, 'b8630d')
-    x = conn.spawn_pos[0]
-    y = conn.spawn_pos[1]
-    d = 1
-    print(conn.KEY)
-    while True:
-        print(f'\r{conn.send_attribute((x, y))}', end='')
-        x += 10**(-2) * d
-        if x > 1200:
-            d = -1
-        elif x < 0:
-            d = 1
