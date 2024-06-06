@@ -5,7 +5,7 @@ from game import sprites
 
 
 class Game:
-    FPS = 144
+    FPS = 60
 
     def __init__(self, connection: game.client.ClientNetwork):
         self.conn = connection
@@ -27,12 +27,14 @@ class Game:
             else:
                 if key != self.conn.KEY:
                     self.sprites[key].set_attribute(server_game[key]['pos'])
-
-        for sprite in self.sprites.values():
-            if sprite.KEY not in server_game.keys():
-                del self.sprites[sprite.KEY]
-            sprite.update(dt)
-            sprite.draw()
+        try:
+            for sprite in self.sprites.values():
+                if sprite.KEY not in server_game.keys():
+                    del self.sprites[sprite.KEY]
+                sprite.update(dt)
+                sprite.draw()
+        except Exception as e:
+            pass
 
     def run(self):
         run = True
@@ -55,4 +57,4 @@ class Game:
 
 
 if __name__ == '__main__':
-    Game(game.client.ClientNetwork("86.253.205.36", 47753)).run()
+    Game(game.client.ClientNetwork("86.253.205.36", 39783)).run()
