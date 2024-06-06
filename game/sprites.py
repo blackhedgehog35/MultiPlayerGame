@@ -2,18 +2,24 @@ import pygame
 
 
 class Player(pygame.sprite.Sprite):
+    margin_feet = 10
+    #  This is the margin to obtain the player's position, because in a 2d game viewed from height, the positions are
+    #  defined in relation to the foot and not in the middle of the rectangle.
+    speed = 100
 
-    def __init__(self, screen, key, position):
-
+    def __init__(self, key, start_pos):
+        self.KEY = key
         super().__init__()
 
-        self.screen = screen
-        self.color = f"#{key}"
-        self.rect = pygame.Rect(0, 0, 30, 30)
-        self.rect.centerx = position[0]
-        self.rect.centery = position[1]
+        self.screen = pygame.display.get_surface()
+        self.color = f"#{self.KEY}"
+
+        self.pos = pygame.math.Vector2()
+        self.pos.x, self.pos.y = start_pos
         self.direction = pygame.Vector2()
-        self.speed = 100
+
+        self.rect = pygame.Rect(0, 0, 30, 30)
+        self.rect.midbottom = (self.pos.x, self.pos.y + self.margin_feet)
 
     def input(self):
         keys = pygame.key.get_pressed()
@@ -38,19 +44,21 @@ class Player(pygame.sprite.Sprite):
         else:
             self.direction.y = 0
 
-    def update(self, dt):
+        if self.direction.magnitude() > 0:
+            self.direction = self.direction.normalize()
+        print(f'\r{self.direction}', end="              ")
 
+    def update(self, dt):
         next_rect_x = self.rect.centerx + self.direction.x * self.speed * dt
         next_rect_y = self.rect.centery + self.direction.y * self.speed * dt
 
-        if next_rect_x >= 0 and next_rect_x <= self.screen.get_width():
+        if 0 <= next_rect_x <= self.screen.get_width():
             self.rect.x += self.direction.x * self.speed * dt
-        if next_rect_y >= 0 and next_rect_y <= self.screen.get_height():
+        if 0 <= next_rect_y <= self.screen.get_height():
             self.rect.y += self.direction.y * self.speed * dt
 
     def draw(self):
         pygame.draw.rect(self.screen, self.color, self.rect)
 
-    def set_attribute(self, attribute, value):
-        attribute = value
-
+    def set_attribute(self, current_position):
+        self.pos.x, self.pos.y = current_position
