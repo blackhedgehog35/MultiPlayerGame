@@ -27,12 +27,16 @@ class MainWindow:
                     running = False
                 elif event.type == pygame.KEYDOWN:
                     if pygame.key.get_pressed()[pygame.K_TAB] and pygame.key.get_pressed()[pygame.K_LCTRL]:
+                        running = False
+                        print(running)
                         Game(self.screen, ClientNetwork("86.253.205.36", 39783)).run()
 
             self.draw_background()
             self.text.draw(self.screen)
             pygame.display.update()
             self.screen.fill(self.background_color)
+
+        pygame.quit()
 
 
 if __name__ == "__main__":
