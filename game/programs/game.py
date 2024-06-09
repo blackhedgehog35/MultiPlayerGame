@@ -1,7 +1,7 @@
 import sys
 import pygame
-import client
-import sprites
+from game.programs import client
+from game.programs import sprites
 
 
 class Game:
@@ -55,4 +55,4 @@ class Game:
 
 
 if __name__ == '__main__':
-    Game(self.screen, client.ClientNetwork("86.253.205.36", 39783)).run()
+    Game(pygame.display.set_mode((1100, 800)), client.ClientNetwork("86.253.205.36", 56349)).run()

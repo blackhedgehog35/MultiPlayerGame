@@ -1,7 +1,7 @@
-from programs.menu import MainWindow
-from programs.ui import Text
+import pygame.display
+from programs.client import ClientNetwork
+from programs.game import Game
 
 
 if __name__ == '__main__':
-    Text("text", 24, (24, 50), 'lbue')
-    MainWindow()
+    Game(pygame.display.set_mode((1100, 800)), ClientNetwork('86.253.205.36', 56349)).run()
