@@ -1,5 +1,4 @@
 import pygame
-import math
 
 
 class Text:
@@ -42,17 +41,19 @@ class Input:
         self.data_size = data_size
         self.data_text = Text(self.data, self.data_size, (self.rect.x + 5, self.rect.y + 5), (0, 0, 0))
 
-    def write(self, letter):
-        print(math.ceil(self.size[0] / self.data_size))
-        if len(self.data) < math.ceil(self.size[0] / self.data_size):
-            self.data += letter
-            self.data_text.update_text(self.data)
+    def write(self, key_pressed):
+        if key_pressed == pygame.K_BACKSPACE:
+            self.data = self.data[0:-1]
+
+        elif self.data_text.text.get_size()[0] + 20 < self.size[0]:
+            self.data += chr(key_pressed)
+        self.data_text.update_text(self.data)
 
     def update_data(self, data):
         data = self.data
 
     def display_data(self):
-        self.data_text.draw(self.screen)
+        self.screen.blit(self.data_text.text, (self.rect.x + 5, self.rect.y + 5))
 
     def draw_input(self):
         pygame.draw.rect(self.screen, self.color, self.rect)

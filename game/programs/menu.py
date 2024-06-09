@@ -15,7 +15,7 @@ class MainWindow:
         pygame.display.set_caption('MENU - MULTIPLAYER GAME')
         self.text = Text('Press <Ctrl> and <Tab> to start the game', 50, (550, 400), 'black', 'center')
         self.game = None
-        self.input = Input(self.screen, (300, 100), (390, 500), (255, 255, 255), 45)
+        self.input = Input(self.screen, (300, 100), (390, 500), (255, 255, 255), 50)
 
     def draw_background(self):
         self.screen.fill(self.background_color)
@@ -34,12 +34,15 @@ class MainWindow:
                         Game(self.screen, ClientNetwork("86.253.205.36", 56349)).run()
 
                     elif self.input.is_writing:
-                        self.input.write(event.unicode)
+                        self.input.write(event.key)
 
                 elif event.type == pygame.MOUSEBUTTONDOWN:
 
                     if self.input.rect.collidepoint(event.pos):
                         self.input.is_writing = True
+
+                    else:
+                        self.input.is_writing = False
 
 
             self.draw_background()
