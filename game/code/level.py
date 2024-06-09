@@ -2,10 +2,11 @@ import sys
 import pygame
 from client import ClientNetwork
 from sprites import Player
+from config import ConfigFile
 
 
-class Game:
-    FPS = 60
+class Level:
+    FPS = ConfigFile().get('DEFAULT', 'FPS')
 
     def __init__(self, screen, connection: ClientNetwork):
         self.conn = connection
@@ -23,18 +24,15 @@ class Game:
         self.sprites[self.conn.KEY].input()
         for key in server_game.keys():
             if key not in self.sprites.keys():
-                self.sprites[key] = sprites.Player(key, server_game[key]['pos'])
+                self.sprites[key] = Player(key, server_game[key]['pos'])
             else:
                 if key != self.conn.KEY:
                     self.sprites[key].set_attribute(server_game[key]['pos'])
-        try:
-            for sprite in self.sprites.values():
-                if sprite.KEY not in server_game.keys():
-                    del self.sprites[sprite.KEY]
-                sprite.update(dt)
-                sprite.draw()
-        finally:
-            pass
+        for sprite in list(self.sprites.values()):
+            if sprite.KEY not in server_game.keys():
+                del self.sprites[sprite.KEY]
+            sprite.update(dt)
+            sprite.draw()
 
     def run(self):
         run = True
@@ -55,4 +53,5 @@ class Game:
 
 
 if __name__ == '__main__':
-    Game(pygame.display.set_mode((1100, 800)), ClientNetwork("86.253.205.36", 56349)).run()
+    host, port = ConfigFile().get_host()
+    Level(pygame.display.set_mode(ConfigFile().get_screen_size()), ClientNetwork(host, port)).run()

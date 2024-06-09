@@ -1,14 +1,14 @@
 import pygame
 from ui import Text, Input
-from game_object import Game
+from level import Level
 from client import ClientNetwork
+from config import ConfigFile
 
 
 class MainWindow:
     pygame.init()
     background_color = '#DCD7D0'
-    width = 1100
-    height = 800
+    width, height = ConfigFile().get_screen_size()
 
     def __init__(self) -> None:
         self.screen = pygame.display.set_mode((self.width, self.height))
@@ -31,7 +31,8 @@ class MainWindow:
                     if pygame.key.get_pressed()[pygame.K_TAB] and pygame.key.get_pressed()[pygame.K_LCTRL]:
                         running = False
                         print(running)
-                        Game(self.screen, ClientNetwork("86.253.205.36", 56349)).run()
+                        host, port = ConfigFile().get_host()
+                        Level(self.screen, ClientNetwork(host=host, port=port)).run()
 
                     elif self.input.is_writing:
                         self.input.write(event.key)
@@ -43,7 +44,6 @@ class MainWindow:
 
                     else:
                         self.input.is_writing = False
-
 
             self.draw_background()
             self.text.draw(self.screen)

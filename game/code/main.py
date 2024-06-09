@@ -1,4 +1,4 @@
-from programs.menu import MainWindow
+from menu import MainWindow
 
 
 if __name__ == '__main__':
