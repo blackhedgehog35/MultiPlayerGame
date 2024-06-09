@@ -39,7 +39,7 @@ class Level:
             elif sprite.KEY not in server_game.keys() and isinstance(sprite, Player):
                 self.all_sprites.remove(sprite)
         self.all_sprites.update(dt)
-        self.all_sprites.custom_draw()
+        self.all_sprites.custom_draw(self.all_sprites.find(self.conn.KEY))
 
     def run(self):
         run = True
