@@ -57,4 +57,4 @@ class Game:
 
 
 if __name__ == '__main__':
-    Game(game.programs.client.ClientNetwork("86.253.205.36", 39783)).run()
+    Game(game.programs.client.ClientNetwork("86.253.205.36", 56349)).run()
