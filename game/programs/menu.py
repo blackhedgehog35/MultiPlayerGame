@@ -28,13 +28,20 @@ class MainWindow:
                 if event.type == pygame.QUIT:
                     running = False
                 elif event.type == pygame.KEYDOWN:
+
                     if pygame.key.get_pressed()[pygame.K_TAB] and pygame.key.get_pressed()[pygame.K_LCTRL]:
                         running = False
                         print(running)
                         Game(self.screen, ClientNetwork("86.253.205.36", 43023)).run()
 
-                    if self.input.is_writing:
+                    elif self.input.is_writing:
                         self.input.write(event.unicode)
+
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+
+                    if self.input.rect.collidepoint(event.pos):
+                        self.input.is_writing = True
+
 
             self.draw_background()
             self.text.draw(self.screen)
