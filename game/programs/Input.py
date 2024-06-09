@@ -2,7 +2,7 @@ import pygame
 
 class Input:
 
-    def __init__(self, screen, size, pos, color):
+    def __init__(self, screen, size: tuple, pos: tuple, color):
         self.screen = screen
         self.data = ""
         self.is_writing = False

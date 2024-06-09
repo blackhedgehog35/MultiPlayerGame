@@ -1,5 +1,6 @@
 import pygame
 import ui
+import Input
 from game import Game
 from client import ClientNetwork
 
@@ -15,6 +16,7 @@ class MainWindow:
         pygame.display.set_caption('MENU - MULTIPLAYER GAME')
         self.text = ui.Text('Press <Ctrl> and <Tab> to start the game', 50, (550, 400), 'black', 'center')
         self.game = None
+        self.input = Input.Input(self.screen, (50, 100), (0, 0), (255, 255, 255))
 
     def draw_background(self):
         self.screen.fill(self.background_color)
@@ -31,10 +33,15 @@ class MainWindow:
                         print(running)
                         Game(self.screen, ClientNetwork("86.253.205.36", 43023)).run()
 
+                    if self.input.is_writing:
+                        self.input.write(event.unicode)
+
             self.draw_background()
             self.text.draw(self.screen)
             pygame.display.update()
             self.screen.fill(self.background_color)
+            self.input.draw_input()
+            self.input.display_data()
 
         pygame.quit()
 
