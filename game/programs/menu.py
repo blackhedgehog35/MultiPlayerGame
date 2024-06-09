@@ -15,7 +15,7 @@ class MainWindow:
         pygame.display.set_caption('MENU - MULTIPLAYER GAME')
         self.text = Text('Press <Ctrl> and <Tab> to start the game', 50, (550, 400), 'black', 'center')
         self.game = None
-        self.input = Input(self.screen, (50, 100), (0, 0), (255, 255, 255))
+        self.input = Input(self.screen, (300, 100), (390, 500), (255, 255, 255), 45)
 
     def draw_background(self):
         self.screen.fill(self.background_color)
@@ -44,10 +44,10 @@ class MainWindow:
 
             self.draw_background()
             self.text.draw(self.screen)
-            pygame.display.update()
-            self.screen.fill(self.background_color)
             self.input.draw_input()
             self.input.display_data()
+            pygame.display.update()
+            self.screen.fill(self.background_color)
 
         pygame.quit()
 

@@ -1,4 +1,5 @@
 import pygame
+import math
 
 
 class Text:
@@ -31,21 +32,27 @@ class Text:
 
 class Input:
 
-    def __init__(self, screen, size: tuple, pos: tuple, color):
+    def __init__(self, screen, size: tuple, pos: tuple, color, data_size):
         self.screen = screen
         self.data = ""
+        self.size = size
         self.is_writing = False
-        self.rect = pygame.Rect(pos[0], pos[1], size[0], size[1])
+        self.rect = pygame.Rect(pos[0], pos[1], self.size[0], self.size[1])
         self.color = color
+        self.data_size = data_size
+        self.data_text = Text(self.data, self.data_size, (self.rect.x + 5, self.rect.y + 5), (0, 0, 0))
 
     def write(self, letter):
-        self.data += letter
+        print(math.ceil(self.size[0] / self.data_size))
+        if len(self.data) < math.ceil(self.size[0] / self.data_size):
+            self.data += letter
+            self.data_text.update_text(self.data)
 
     def update_data(self, data):
         data = self.data
 
     def display_data(self):
-        self.screen.blit(self.data, (self.rect.x + 5, self.rect.y + 5))
+        self.data_text.draw(self.screen)
 
     def draw_input(self):
         pygame.draw.rect(self.screen, self.color, self.rect)
