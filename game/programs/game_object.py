@@ -1,19 +1,19 @@
 import sys
 import pygame
-from game.programs import client
-from game.programs import sprites
+from client import ClientNetwork
+from sprites import Player
 
 
 class Game:
     FPS = 60
 
-    def __init__(self, screen, connection: client.ClientNetwork):
+    def __init__(self, screen, connection: ClientNetwork):
         self.conn = connection
         pygame.init()
         self.screen = screen
         pygame.display.set_caption('')
         self.clock = pygame.time.Clock()
-        self.sprites = {self.conn.KEY: sprites.Player(self.conn.KEY, self.conn.spawn_pos)}
+        self.sprites = {self.conn.KEY: Player(self.conn.KEY, self.conn.spawn_pos)}
 
     def draw_bg(self):
         self.screen.fill('#5a5a5a')
@@ -55,4 +55,4 @@ class Game:
 
 
 if __name__ == '__main__':
-    Game(pygame.display.set_mode((1100, 800)), client.ClientNetwork("86.253.205.36", 56349)).run()
+    Game(pygame.display.set_mode((1100, 800)), ClientNetwork("86.253.205.36", 56349)).run()
