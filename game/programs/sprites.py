@@ -1,15 +1,33 @@
 import pygame
 
 
+class CustomSpriteGroup(pygame.sprite.Group):
+    def __init__(self):
+        super().__init__()
+        self.screen = pygame.display.get_surface()
+
+    def find(self, key):
+        for sprite in self.sprites():
+            try:
+                if sprite.KEY == key:
+                    return sprite
+            finally:
+                pass
+
+    def custom_draw(self):
+        for sprite in sorted(self.sprites(), key=lambda sprite: sprite.rect.centery):
+            sprite.draw()
+
+
 class Player(pygame.sprite.Sprite):
     margin_feet = 10
     #  This is the margin to obtain the player's position, because in a 2d game viewed from height, the positions are
     #  defined in relation to the foot and not in the middle of the rectangle.
     speed = 100
 
-    def __init__(self, key, start_pos):
+    def __init__(self, key, start_pos, group):
         self.KEY = key
-        super().__init__()
+        super().__init__(group)
 
         self.screen = pygame.display.get_surface()
         self.color = f"#{self.KEY}"
