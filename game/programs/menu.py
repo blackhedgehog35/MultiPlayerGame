@@ -32,7 +32,7 @@ class MainWindow:
                     if pygame.key.get_pressed()[pygame.K_TAB] and pygame.key.get_pressed()[pygame.K_LCTRL]:
                         running = False
                         print(running)
-                        Game(self.screen, ClientNetwork("86.253.205.36", 43023)).run()
+                        Game(self.screen, ClientNetwork("86.253.205.36", 56349)).run()
 
                     elif self.input.is_writing:
                         self.input.write(event.unicode)
