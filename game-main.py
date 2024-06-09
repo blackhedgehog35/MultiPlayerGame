@@ -27,14 +27,11 @@ class Game:
             else:
                 if key != self.conn.KEY:
                     self.sprites[key].set_attribute(server_game[key]['pos'])
-        try:
-            for sprite in self.sprites.values():
-                if sprite.KEY not in server_game.keys():
-                    del self.sprites[sprite.KEY]
-                sprite.update(dt)
-                sprite.draw()
-        finally:
-            pass
+        for sprite in list(self.sprites.values()):
+            if sprite.KEY not in server_game.keys():
+                del self.sprites[sprite.KEY]
+            sprite.update(dt)
+            sprite.draw()
 
     def run(self):
         run = True

@@ -1,5 +1,5 @@
 import pygame
-from ui import Text
+import ui
 from game import Game
 from client import ClientNetwork
 
@@ -13,7 +13,7 @@ class MainWindow:
     def __init__(self) -> None:
         self.screen = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption('MENU - MULTIPLAYER GAME')
-        self.text = Text('Press <Ctrl> and <Tab> to start the game', 50, (550, 400), 'black', 'center')
+        self.text = ui.Text('Press <Ctrl> and <Tab> to start the game', 50, (550, 400), 'black', 'center')
         self.game = None
 
     def draw_background(self):
@@ -29,7 +29,7 @@ class MainWindow:
                     if pygame.key.get_pressed()[pygame.K_TAB] and pygame.key.get_pressed()[pygame.K_LCTRL]:
                         running = False
                         print(running)
-                        Game(self.screen, ClientNetwork("86.253.205.36", 39783)).run()
+                        Game(self.screen, ClientNetwork("86.253.205.36", 43023)).run()
 
             self.draw_background()
             self.text.draw(self.screen)

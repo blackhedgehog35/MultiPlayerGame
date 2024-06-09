@@ -1,10 +1,10 @@
-import miniupnpc
+import sys
 import socket
 import pickle
+import miniupnpc
 import threading
-import server.client
-import server.function
-from configparser import ConfigParser
+import server.programs.client
+import server.programs.function
 """
         if self.public_ip:
             custom_print("Public IP Address:", self.public_ip)
@@ -29,8 +29,6 @@ from configparser import ConfigParser
 
 
 class Server:
-    config = ConfigParser()
-    config.read('config.ini')
     world = {}
     PORT = 3055
 
@@ -40,13 +38,8 @@ class Server:
 
         self.PORT = self.server_socket.getsockname()[1]
         self.HOST = self.setup_upnp_port_mapping()
-        server.function.custom_print("Public IP Address:", self.HOST)
-        server.function.custom_print("Public IP Port:", self.PORT)
-
-        self.config.set('server', 'host', self.HOST)
-        self.config.set('server', 'port', str(self.PORT))
-        with open('config.ini', 'w') as configfile:
-            self.config.write(configfile)
+        server.programs.function.custom_print("Public IP Address:", self.HOST)
+        server.programs.function.custom_print("Public IP Port:", self.PORT)
 
     def setup_upnp_port_mapping(self):
         upnp = miniupnpc.UPnP()
@@ -59,7 +52,7 @@ class Server:
 
     def client_connection(self, client_socket, addr):
         #  Start of the connection with the client
-        client_conn = server.client.ClientConn(client_socket, addr, self.world)
+        client_conn = server.programs.client.ClientConn(client_socket, addr, self.world)
         self.world[client_conn.KEY] = {'online': True, 'pos': client_conn.pos}
         while True:
             try:
@@ -74,18 +67,23 @@ class Server:
 
         client_conn.socket.close()
         self.world[client_conn.KEY]['online'] = False
-        server.function.custom_print('[CONNECTION] End With', f'{client_conn.address_ip}:{client_conn.port}')
-        print()
+        server.programs.function.custom_print('[CONNECTION] End With', f'{client_conn.address_ip}:{client_conn.port}')
+
+    def input_server(self):
+        while True:
+            message = input('')
+            if message.lower() in ['world', 'echo', 'print']:
+                print(self.world)
 
     def start(self):
         self.server_socket.listen()
-        print(f"{self.HOST}:{self.PORT}".center(server.function.LEN_TOTAL_PRINT, "="))
-        print()
+        print(f"{self.HOST}:{self.PORT}".center(server.programs.function.LEN_TOTAL_PRINT, "="))
+        thread = threading.Thread(target=self.input_server)
+        thread.start()
         while True:
             conn, addr = self.server_socket.accept()
 
             thread = threading.Thread(target=self.client_connection, args=(conn, addr))
-            server.function.custom_print('[CONNECTION] Start With', f'{addr[0]}:{addr[1]}')
+            print()
+            server.programs.function.custom_print('[CONNECTION] Start With', f'{addr[0]}:{addr[1]}')
             thread.start()
-
-
