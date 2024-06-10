@@ -52,8 +52,7 @@ class CustomSpriteGroup(pygame.sprite.Group):
             sprite.draw(offset_pos)
 
 
-class Player(pygame.sprite.Sprite):
-    margin_feet = 10
+class Sprite(pygame.sprite.Sprite):
     #  This is the margin to obtain the player's position, because in a 2d game viewed from height, the positions are
     #  defined in relation to the foot and not in the middle of the rectangle.
     speed = 250
@@ -72,7 +71,7 @@ class Player(pygame.sprite.Sprite):
         self.direction = pygame.Vector2()
 
         self.rect = pygame.Rect(0, 0, self.w, self.h)
-        self.rect.midbottom = (self.pos.x, self.pos.y + self.margin_feet)
+        self.rect.midbottom = (self.pos.x, self.pos.y)
 
     def input(self):
         keys = pygame.key.get_pressed()
