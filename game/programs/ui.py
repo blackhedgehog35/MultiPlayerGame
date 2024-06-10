@@ -1,4 +1,13 @@
 import pygame
+from config import ConfigFile
+
+
+def show_info(content, pos, side='topleft'):
+    font = pygame.font.SysFont('Liberation Mono', 20)
+    text_surface = font.render(str(content), True, (255, 255, 255))
+    rect = text_surface.get_rect()
+    setattr(rect, side, pos)
+    pygame.display.get_surface().blit(text_surface, rect)
 
 
 class Shapes:

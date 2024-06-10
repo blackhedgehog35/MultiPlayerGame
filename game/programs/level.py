@@ -3,6 +3,7 @@ import pygame
 from client import ClientNetwork
 from sprites import Player, CustomSpriteGroup
 from config import ConfigFile
+from ui import show_info
 
 
 class Level:
@@ -23,6 +24,7 @@ class Level:
 
     def update(self, dt, server_game):
         self.draw_bg()
+        show_info(f'POS : {self.all_sprites.find(self.conn.KEY).pos}', (0, self.screen.get_height()), 'bottomleft')
         #  Update the local game with the server
         for key in server_game.keys():
             if key not in [sprite.KEY for sprite in self.all_sprites.sprites()]:

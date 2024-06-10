@@ -32,7 +32,6 @@ class CustomSpriteGroup(pygame.sprite.Group):
         self.offset.y = target.rect.centery - self.half_h
 
     def box_target_camera(self, target):
-        pygame.draw.rect(self.screen, '#ffffff', self.camera_rect)
         if target.rect.left < self.camera_rect.left:
             self.camera_rect.left = target.rect.left
         elif target.rect.right > self.camera_rect.right:
@@ -47,7 +46,6 @@ class CustomSpriteGroup(pygame.sprite.Group):
         self.offset.y = self.camera_rect.top - self.camera_borders['top']
 
     def custom_draw(self, player):
-
         self.box_target_camera(player)
         for sprite in sorted(self.sprites(), key=lambda sprite: sprite.rect.centery):
             offset_pos = sprite.rect.topleft - self.offset
