@@ -16,9 +16,9 @@ class MainWindow:
         self.text = Text(self.screen, 'Press <Ctrl> and <Tab> to start the game', 50, (550, 400), 'black', 'center')
         self.game = None
         self.input = Input(self.screen, (300, 100), (390, 500), (255, 255, 255), "rounded rect", 50, radius=25)
-        self.button = Button(self.screen, (100, 100), (600, 300), (255, 0, 0), "rounded rect", [pygame.quit], radius=25)
-        self.selector = Selector(self.screen, (600, 600), [Text(self.screen, "hgffdgfdgfdgfd", 25, (0, 0)),
-                                                                       Text(self.screen, "hgfh", 25, (0, 0), (0, 0, 0))])
+        self.button = Button(self.screen, (100, 100), (self.screen.get_width() - 150, self.screen.get_height() - 150), (255, 0, 0), "rounded rect", [pygame.quit], data=Text(self.screen, "fgfd", 25, (0, 0), (0, 0, 0)), radius=25)
+        self.selector = Selector(self.screen, (600, 600), (0, 0, 0), [Text(self.screen, "g", 25, (0, 0)),
+                                                                       Text(self.screen, "fgfd", 25, (0, 0), (0, 0, 0))], "rect")
 
     def draw_background(self):
         self.screen.fill(self.background_color)
@@ -56,7 +56,7 @@ class MainWindow:
             self.text.draw()
             self.input.draw()
             self.button.draw()
-            self.selector.draw()
+            self.selector.draw_all()
             self.input.display_data()
             pygame.display.update()
             self.screen.fill(self.background_color)
