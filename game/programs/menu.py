@@ -1,6 +1,5 @@
 import pygame
 from ui import Text, Button
-from Settings import Settings
 from level import Level
 from client import ClientNetwork
 from config import ConfigFile
@@ -15,9 +14,9 @@ class MainWindow:
         self.screen = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption('MENU - MULTIPLAYER GAME')
         self.game = None
-        self.text = Text(self.screen, 'Press <Ctrl> and <Tab> to start the game', 50, (self.width / 2, self.height / 2), 'black', 'center')
-        self.settings_button = Button(self.screen, (75, 75), (self.width - 100, self.height - 100), (0, 0, 0), "rounded rect", [Settings(self.screen).run, self.stop_menu],
-                                      Text(self.screen, "Settings", 15, (0, 0), (255, 255, 255)))
+        self.text = Text(self.screen, 'Press <Ctrl> and <Tab> to start the game', 50, (self.width / 2, self.height / 2), 'black')
+        self.settings_button = Button(self.screen, (75, 75), (self.width - 100, self.height - 100), (0, 0, 0), "rounded rect", [self.stop_menu],
+                                      Text(self.screen, "Settings", 15, (0, 0), (255, 255, 255), "center"))
 
     def draw_background(self):
         self.screen.fill(self.background_color)
@@ -27,6 +26,7 @@ class MainWindow:
 
     def run(self) -> None:
         self.running = True
+
         while self.running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -41,9 +41,7 @@ class MainWindow:
                         Level(self.screen, ClientNetwork(host=host, port=port)).run()
 
                 elif event.type == pygame.MOUSEBUTTONDOWN:
-                    print('check')
-                    self.settings_button.check_clicked(event)
-
+                    pass
 
             self.draw_background()
             self.text.draw()

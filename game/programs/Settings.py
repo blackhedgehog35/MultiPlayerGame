@@ -4,15 +4,14 @@ from  ui import *
 class Settings:
 
     pygame.init()
-    bg_color = "#DCD7D0"
+    bg_color = "black"
 
     def __init__(self, screen):
-        print("settings")
         self.screen = screen
-        self.keyboard_selector = Selector(self.screen, (750, 350), (255, 255, 255),
-                                          [Text(self.screen, "", 50, (0, 0), (255, 255, 255)), Text(self.screen, "", 50, (0, 0), (255, 255, 255))], "rect")
-        self.port_input = Input(self.screen, (100, 50), (750, 150), (0, 0, 255), "rect", 50, "")
-        self.adress_input = Input(self.screen, (100, 50), (750, 225), (0, 0, 255), "rect", 50, "")
+        self.keyboard_selector = Selector(self.screen, (750, 450), (0, 0, 255),
+                                          [Text(self.screen, "bvc", 50, (0, 0), (255, 255, 255)), Text(self.screen, "bvc", 50, (0, 0), (255, 255, 255))], "rect")
+        self.port_input = Input(self.screen, (150, 25), (750, 150), (0, 0, 255), "rect", "", title="PORT")
+        self.adress_input = Input(self.screen, (150, 25), (750, 300), (0, 0, 255), "rect", "", title="ADRESS IP")
 
     def draw_bg(self):
         self.screen.fill(self.bg_color)
@@ -44,6 +43,7 @@ class Settings:
                 self.adress_input.draw()
                 self.port_input.draw()
                 self.keyboard_selector.draw()
+                self.keyboard_selector.draw_all()
 
                 pygame.display.flip()
 
