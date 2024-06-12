@@ -1,5 +1,6 @@
 import pygame
-from ui import *
+from ui import Text, Button
+from Settings import Settings
 from level import Level
 from client import ClientNetwork
 from config import ConfigFile
@@ -13,55 +14,43 @@ class MainWindow:
     def __init__(self) -> None:
         self.screen = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption('MENU - MULTIPLAYER GAME')
-        self.text = Text(self.screen, 'Press <Ctrl> and <Tab> to start the game', 50, (550, 400), 'black', 'center')
         self.game = None
-        self.input = Input(self.screen, (300, 100), (390, 500), (255, 255, 255), "rounded rect", 50, radius=25)
-        self.button = Button(self.screen, (100, 100), (self.screen.get_width() - 150, self.screen.get_height() - 150), (255, 0, 0), "rounded rect", [pygame.quit], data=Text(self.screen, "fgfd", 25, (0, 0), (0, 0, 0)), radius=25)
-        self.selector = Selector(self.screen, (600, 600), (0, 0, 0), [Text(self.screen, "g", 25, (0, 0)),
-                                                                       Text(self.screen, "fgfd", 25, (0, 0), (0, 0, 0))], "rect")
+        self.text = Text(self.screen, 'Press <Ctrl> and <Tab> to start the game', 50, (self.width / 2, self.height / 2), 'black', 'center')
+        self.settings_button = Button(self.screen, (75, 75), (self.width - 100, self.height - 100), (0, 0, 0), "rounded rect", [Settings(self.screen).run, self.stop_menu],
+                                      Text(self.screen, "Settings", 15, (0, 0), (255, 255, 255)))
 
     def draw_background(self):
         self.screen.fill(self.background_color)
 
+    def stop_menu(self):
+        self.running = False
+
     def run(self) -> None:
-        running = True
-        while running:
+        self.running = True
+        while self.running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    running = False
+                    print(self.running)
+                    self.stop_menu()
+                    pygame.quit()
                 elif event.type == pygame.KEYDOWN:
 
                     if pygame.key.get_pressed()[pygame.K_TAB] and pygame.key.get_pressed()[pygame.K_LCTRL]:
-                        running = False
-                        print(running)
+                        self.stop_menu()
                         host, port = ConfigFile().get_host()
                         Level(self.screen, ClientNetwork(host=host, port=port)).run()
 
-                    elif self.input.is_writing:
-                        self.input.write(event.key)
-
                 elif event.type == pygame.MOUSEBUTTONDOWN:
+                    print('check')
+                    self.settings_button.check_clicked(event)
 
-                    if self.input.rect.collidepoint(event.pos):
-                        self.input.is_writing = True
-
-                    else:
-                        self.input.is_writing = False
-
-                    self.button.check_clicked(event)
-                    self.selector.left_arrow.check_clicked(event)
-                    self.selector.right_arrow.check_clicked(event)
 
             self.draw_background()
             self.text.draw()
-            self.input.draw()
-            self.button.draw()
-            self.selector.draw_all()
-            self.input.display_data()
+            self.settings_button.draw()
             pygame.display.update()
             self.screen.fill(self.background_color)
 
-        pygame.quit()
 
 
 if __name__ == "__main__":
