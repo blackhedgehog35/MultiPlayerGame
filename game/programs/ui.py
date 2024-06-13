@@ -13,12 +13,14 @@ def show_info(content, pos, side='topleft'):
 
 class Shapes:
 
-    def __init__(self, screen, size: tuple, pos: tuple, color, shape, data, radius, title):
+    def __init__(self, screen, size: tuple, pos: tuple, color, shape, data, radius, title, side):
         self.screen = screen
         self.shape = shape
         self.color = color
         self.size = size
-        self.rect = pygame.Rect(pos, self.size)
+        self.side = side
+        self.pos = pos
+        self.rect = pygame.Rect(self.pos, self.size)
         self.data = data
         self.title = title
         self.init_title(title)
@@ -69,6 +71,7 @@ class Shapes:
     def update_pos(self, pos):
         self.rect.x = pos[0]
         self.rect.y = pos[1]
+        setattr(self.rect, self.side, self.pos)
 
     def update_size(self, size):
         self.rect.size = size
@@ -123,12 +126,12 @@ class Images:
 
 class Input(Shapes):
 
-    def __init__(self, screen, size: tuple, pos: tuple, bg_color, shape: str, data: str, radius=5, title=None):
+    def __init__(self, screen, size: tuple, pos: tuple, bg_color, shape: str, data: str, radius=5, title=None, side="center"):
         self.data_size = math.ceil(size[1] * 1.333 - 10)
         self.data_text = data
         self.data = Text(screen, self.data_text, self.data_size, (0, 0), (0, 0, 0))
 
-        super().__init__(screen, size, pos, bg_color, shape, self.data, radius, title)
+        super().__init__(screen, size, pos, bg_color, shape, self.data, radius, title, side)
         self.is_writing = False
 
     def write(self, key_pressed):
@@ -160,8 +163,8 @@ class Input(Shapes):
 
 class Button(Shapes):
 
-    def __init__(self, screen, size: tuple, pos: tuple, color, shape: str, effect: list, data=None, radius=5, title=None):
-        super().__init__(screen, size, pos, color, shape, data, radius, title)
+    def __init__(self, screen, size: tuple, pos: tuple, color, shape: str, effect: list, data=None, radius=5, title=None, side="center"):
+        super().__init__(screen, size, pos, color, shape, data, radius, title, side)
         self.all_effects = effect
 
     def click(self):
@@ -175,16 +178,16 @@ class Button(Shapes):
 
 class Selector(Shapes):
 
-    def __init__(self, screen, pos, color, list_to_display: list, shape: str, radius=5, data=None, title=None):
+    def __init__(self, screen, pos, color, list_to_display: list, shape: str, radius=5, data=None, title=None, side="center"):
         self.list_to_display = list_to_display
         self.number = 0
         size = self.define_size()
-        super().__init__(screen, size, pos, color, shape, data, radius, title)
+        super().__init__(screen, size, pos, color, shape, data, radius, title, side)
         self.left_arrow = Button(self.screen, (self.size[0] / 2, self.size[1] / 2),
-                                 (self.rect.x - 50 - self.size[0] / 2, self.rect.centery), color
+                                 (self.rect.x - size[0] - 30, self.rect.y), color
                                  , "rect", [lambda: self.add_number(-1)])
         self.right_arrow = Button(self.screen, (self.size[0] / 2, self.size[1] / 2),
-                                  (self.rect.x + self.rect.width + 50, self.rect.centery), color
+                                  (self.rect.x + size[0] + 30, self.rect.y), color
                                   , "rect", [lambda: self.add_number(1)])
 
     def define_size(self):
