@@ -185,10 +185,10 @@ class Selector(Shapes):
         super().__init__(screen, size, pos, color, shape, data, radius, title, side)
         self.left_arrow = Button(self.screen, (self.size[0] / 2, self.size[1] / 2),
                                  (self.rect.x - size[0] - 30, self.rect.y), color
-                                 , "rect", [lambda: self.add_number(-1)])
+                                 , "rect", [lambda: self.add_number(-1)], side="center")
         self.right_arrow = Button(self.screen, (self.size[0] / 2, self.size[1] / 2),
                                   (self.rect.x + size[0] + 30, self.rect.y), color
-                                  , "rect", [lambda: self.add_number(1)])
+                                  , "rect", [lambda: self.add_number(1)], side="center")
 
     def define_size(self):
         all_data_size = []
@@ -199,10 +199,10 @@ class Selector(Shapes):
         return all_data_size[self.number]
 
     def draw_all(self):
+        self.draw(size=self.define_size())
         self.screen.blit(self.list_to_display[self.number].text, self.rect)
         self.right_arrow.draw((self.rect.x + self.rect.width + 50, self.rect.centery))
         self.left_arrow.draw((self.rect.x - 50, self.rect.centery))
-        self.draw(size=self.define_size())
 
     def add_number(self, amount):
         self.number += amount
