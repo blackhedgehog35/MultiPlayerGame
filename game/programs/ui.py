@@ -13,10 +13,12 @@ def show_info(content, pos, side='topleft'):
 
 class Shapes:
 
-    def __init__(self, screen, size: tuple, pos: tuple, color, shape, data, radius, title, side):
+    def __init__(self, screen, group, size: tuple, pos: tuple, color, shape, data, radius, title, side):
         self.screen = screen
         self.shape = shape
         self.color = color
+        self.group = group
+        self.group.append(self)
         self.size = size
         self.side = side
         self.pos = pos
@@ -32,6 +34,8 @@ class Shapes:
             "rounded rect": lambda: self.draw_rounded_rectangle(self.screen, self.color, self.rect, radius),
             "none": lambda: self.draw_nothing()
         }
+
+        setattr(self.rect, self.side, self.pos)
 
     def draw_rounded_rectangle(self, screen, color, rect, radius):
         x, y, width, height = rect
@@ -49,7 +53,7 @@ class Shapes:
 
     def init_title(self, title):
         if title is not None:
-            self.title = Text(self.screen, title, math.ceil((self.size[1] / 2) * 1.333), (self.rect.centerx, self.rect.centery - self.size[1] / 2 - 20), self.color, "center")
+            self.title = Text(self.screen, self.group, title, math.ceil((self.size[1] / 2) * 1.333), (self.rect.centerx, self.rect.centery - self.size[1] / 2 - 20), self.color, "center")
 
 
     def draw(self, pos=None, size=None):
@@ -71,7 +75,6 @@ class Shapes:
     def update_pos(self, pos):
         self.rect.x = pos[0]
         self.rect.y = pos[1]
-        setattr(self.rect, self.side, self.pos)
 
     def update_size(self, size):
         self.rect.size = size
@@ -80,8 +83,9 @@ class Shapes:
 class Text:
     font_name = "COMIC SANS MS"
 
-    def __init__(self, screen, text, size, pos, color=(255, 255, 255), side='center'):
+    def __init__(self, screen, group, text, size, pos, color=(255, 255, 255), side='center'):
         self.screen = screen
+        group.append(self)
         self.color = color
         self.text_str = text
         self.size = size
@@ -112,8 +116,9 @@ class Text:
 
 class Images:
 
-    def __init__(self, screen, size, pos, image):
+    def __init__(self, group, screen, size, pos, image):
         self.screen = screen
+        group.append(self)
         self.rect = pygame.Rect(pos, size)
         self.image = image
         self.image = pygame.transform.scale(self.image, size)
@@ -126,12 +131,12 @@ class Images:
 
 class Input(Shapes):
 
-    def __init__(self, screen, size: tuple, pos: tuple, bg_color, shape: str, data: str, radius=5, title=None, side="center"):
+    def __init__(self, screen, group, size: tuple, pos: tuple, bg_color, shape: str, data: str, radius=5, title=None, side="center"):
         self.data_size = math.ceil(size[1] * 1.333 - 10)
         self.data_text = data
-        self.data = Text(screen, self.data_text, self.data_size, (0, 0), (0, 0, 0))
+        self.data = Text(screen, group, self.data_text, self.data_size, (0, 0), (0, 0, 0))
 
-        super().__init__(screen, size, pos, bg_color, shape, self.data, radius, title, side)
+        super().__init__(screen, group, size, pos, bg_color, shape, self.data, radius, title, side)
         self.is_writing = False
 
     def write(self, key_pressed):
@@ -163,8 +168,8 @@ class Input(Shapes):
 
 class Button(Shapes):
 
-    def __init__(self, screen, size: tuple, pos: tuple, color, shape: str, effect: list, data=None, radius=5, title=None, side="center"):
-        super().__init__(screen, size, pos, color, shape, data, radius, title, side)
+    def __init__(self, screen, group, size: tuple, pos: tuple, color, shape: str, effect: list, data=None, radius=5, title=None, side="center"):
+        super().__init__(screen, group, size, pos, color, shape, data, radius, title, side)
         self.all_effects = effect
 
     def click(self):
@@ -178,15 +183,15 @@ class Button(Shapes):
 
 class Selector(Shapes):
 
-    def __init__(self, screen, pos, color, list_to_display: list, shape: str, radius=5, data=None, title=None, side="center"):
+    def __init__(self, screen, group, pos, color, list_to_display: list, shape: str, radius=5, data=None, title=None, side="center"):
         self.list_to_display = list_to_display
         self.number = 0
         size = self.define_size()
-        super().__init__(screen, size, pos, color, shape, data, radius, title, side)
-        self.left_arrow = Button(self.screen, (self.size[0] / 2, self.size[1] / 2),
+        super().__init__(screen, group, size, pos, color, shape, data, radius, title, side)
+        self.left_arrow = Button(self.screen, group, (self.size[0] / 2, self.size[1] / 2),
                                  (self.rect.x - size[0] - 30, self.rect.y), color
                                  , "rect", [lambda: self.add_number(-1)], side="center")
-        self.right_arrow = Button(self.screen, (self.size[0] / 2, self.size[1] / 2),
+        self.right_arrow = Button(self.screen, group, (self.size[0] / 2, self.size[1] / 2),
                                   (self.rect.x + size[0] + 30, self.rect.y), color
                                   , "rect", [lambda: self.add_number(1)], side="center")
 

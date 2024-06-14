@@ -13,11 +13,12 @@ class MainWindow:
 
     def __init__(self) -> None:
         self.screen = pygame.display.set_mode((self.width, self.height))
+        self.sprites = []
         pygame.display.set_caption('MENU - MULTIPLAYER GAME')
         self.game = None
-        self.text = Text(self.screen, 'Press <Ctrl> and <Tab> to start the game', 50, (self.width / 2, self.height / 2), 'black')
-        self.settings_button = Button(self.screen, (75, 75), (self.width - 100, self.height - 100), (0, 0, 0), "rounded rect", [self.stop_menu,
-                        Settings(self.screen, self).run],Text(self.screen, "Settings", 15, (0, 0), (255, 255, 255), "center"))
+        self.text = Text(self.screen, self.sprites, 'Press <Ctrl> and <Tab> to start the game', 50, (self.width / 2, self.height / 2), 'black')
+        self.settings_button = Button(self.screen, self.sprites, (75, 75), (self.width - 100, self.height - 100), (0, 0, 0), "rounded rect", [self.stop_menu,
+                        Settings(self.screen, self).run],  Text(self.screen, self.sprites, "Settings", 15, (0, 0), (255, 255, 255), "center"))
 
         print(self.settings_button.side)
 
