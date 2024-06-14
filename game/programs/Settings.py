@@ -1,5 +1,5 @@
-import  pygame
-from  ui import *
+import pygame
+from ui import *
 
 class Settings:
 
@@ -8,12 +8,16 @@ class Settings:
 
     def __init__(self, screen):
         self.screen = screen
-        self.settings_text = Text(self.screen, "Settings", 30, (75, 25), (0, 0, 255))
-        self.exit_button = Button(self.screen, (40, 50), (50, 50), (0, 0, 255), "rounded rect", [self.stop_settings])
-        self.keyboard_selector = Selector(self.screen, (750, 450), (0, 0, 255),
+        self.around_text = Shapes(self.screen, (200, 60), (0, 20), (50, 50, 50), "rect", None, 5, None, "topleft")
+        self.settings_text = Text(self.screen, "Settings", 30, (75, 25), (255, 255, 255))
+        self.exit_button = Button(self.screen, (40, 50), (30, 50), (255, 255, 255), "rounded rect", [self.stop_settings])
+
+        self.line = Shapes(self.screen, (3, self.screen.get_height()), (210, 0), (50, 50, 50), "rect", None, 5, None, "topleft")
+
+        self.keyboard_selector = Selector(self.screen, (750, 450), (200, 200, 200),
                                           [Text(self.screen, "bvc", 50, (0, 0), (255, 255, 255)), Text(self.screen, "bvc", 50, (0, 0), (255, 255, 255))], "rect")
-        self.port_input = Input(self.screen, (150, 25), (750, 150), (0, 0, 255), "rect", "", title="PORT")
-        self.adress_input = Input(self.screen, (150, 25), (750, 300), (0, 0, 255), "rect", "", title="ADRESS IP")
+        self.port_input = Input(self.screen, (150, 25), (750, 150), (200, 200, 200), "rect", "", title="PORT")
+        self.adress_input = Input(self.screen, (150, 25), (750, 300), (200, 200, 200), "rect", "", title="ADRESS IP")
 
     def draw_bg(self):
         self.screen.fill(self.bg_color)
@@ -27,8 +31,13 @@ class Settings:
         while self.running:
 
             self.draw_bg()
-            self.exit_button.draw()
+
+            self.around_text.draw()
             self.settings_text.draw()
+            self.exit_button.draw()
+
+            self.line.draw()
+
             self.adress_input.draw()
             self.port_input.draw()
             self.keyboard_selector.draw()
@@ -45,6 +54,7 @@ class Settings:
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     self.adress_input.check_clicked(event)
                     self.port_input.check_clicked(event)
+                    self.exit_button.check_clicked(event)
                     self.keyboard_selector.check_arrows_clicked(event)
 
                 elif event.type == pygame.KEYDOWN:
