@@ -20,8 +20,6 @@ class MainWindow:
         self.settings_button = Button(self.screen, self.sprites, (75, 75), (self.width - 100, self.height - 100), (0, 0, 0), "rounded rect", [self.stop_menu,
                         Settings(self.screen, self).run],  Text(self.screen, self.sprites, "Settings", 15, (0, 0), (255, 255, 255), "center"))
 
-        print(self.settings_button.side)
-
     def draw_background(self):
         self.screen.fill(self.background_color)
 

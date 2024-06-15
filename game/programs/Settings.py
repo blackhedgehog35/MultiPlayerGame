@@ -21,6 +21,7 @@ class Settings:
                                           [Text(self.screen, self.sprites, "QWERTY", 18, (0, 0), (0, 0, 0)), Text(self.screen, self.sprites, "AZERTY", 18, (0, 0), (0, 0, 0))], "rect", title="KEYBOARD")
         self.port_input = Input(self.screen, self.sprites, (150, 25), (750, 150), (200, 200, 200), "rect", "", title="PORT")
         self.adress_input = Input(self.screen, self.sprites, (150, 25), (750, 300), (200, 200, 200), "rect", "", title="ADRESS IP")
+        self.luminosity_cursor = Cursor(self.screen, self.sprites, (150, 10), (750, 800), (200, 200, 200), 20, 1/1, "Luminosity", "center")
 
     def draw_bg(self):
         self.screen.fill(self.bg_color)
@@ -42,6 +43,7 @@ class Settings:
             self.line.draw()
 
             self.adress_input.draw()
+            self.luminosity_cursor.draw_all()
             self.port_input.draw()
             self.keyboard_selector.draw()
             self.keyboard_selector.draw_all()
@@ -59,13 +61,14 @@ class Settings:
                     self.port_input.check_clicked(event)
                     self.exit_button.check_clicked(event)
                     self.keyboard_selector.check_arrows_clicked(event)
+                    self.luminosity_cursor.check_clicked(event)
 
                 elif event.type == pygame.KEYDOWN:
                     self.adress_input.check_key(event)
                     self.port_input.check_key(event)
 
                 elif event.type == pygame.MOUSEWHEEL:
-                    if event.y < 0:
+                    if event.y > 0:
                         for sprite in self.sprites:
                             sprite.rect.y += 3
                     else:

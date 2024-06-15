@@ -36,6 +36,7 @@ class Shapes:
         }
 
         setattr(self.rect, self.side, self.pos)
+        print(self.rect)
 
     def draw_rounded_rectangle(self, screen, color, rect, radius):
         x, y, width, height = rect
@@ -222,3 +223,27 @@ class Selector(Shapes):
     def check_arrows_clicked(self, event):
         self.left_arrow.check_clicked(event)
         self.right_arrow.check_clicked(event)
+
+
+class Cursor(Shapes):
+
+    def __init__(self, screen, group, size, pos, color, data: int, scale, title=None, side="center"):
+        self.background = Shapes(screen, group, size, pos, (0, 255, 0), "rect", None, 5, None, side)
+        super().__init__(screen, group, (data * scale, size[1]), (self.background.rect.x, self.background.rect.y), color, "rect", None, 5, title, "topleft")
+        print("pointer")
+        self.pointer = Shapes(screen, group, (20, 20), (self.rect.x + data * scale, self.rect.centery), color, "circle", None, size[0] / 10, None, "topleft")
+        self.nb = data
+
+    def draw_all(self):
+        self.background.draw()
+        self.draw()
+        self.pointer.draw()
+
+    def check_clicked(self, event):
+        if self.pointer.rect.collidepoint(event.pos):
+            x, y = pygame.mouse.get_pos()
+            print(x, y)
+            print(self.pointer.rect.x < self.background.rect.x + self.background.size[0])
+            if self.pointer.rect.x < self.background.size[0]:
+                self.pointer.rect.x = x
+                self.nb = x - self.rect.x
