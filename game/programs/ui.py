@@ -58,13 +58,11 @@ class Shapes:
 
 
     def draw(self, pos=None, size=None):
-        if not pos:
-            pos = (self.rect.x, self.rect.y)
-        if not size:
-            size = self.rect.size
+        if pos is not None:
+            self.update_pos(pos)
+        if size is not None:
+            self.update_size(size)
 
-        self.update_pos(pos)
-        self.update_size(size)
         self.all_shapes.get(self.shape)()
         if self.data is not None:
             self.data.update_pos(self.rect.center)
@@ -74,24 +72,23 @@ class Shapes:
             self.title.draw()
 
     def update_pos(self, pos):
-        self.rect.x = pos[0]
-        self.rect.y = pos[1]
+        self.pos = pos
+        setattr(self.rect, self.side, self.pos)
 
     def update_size(self, size):
         self.rect.size = size
+        setattr(self.rect, self.side, self.pos)
 
 
 class Text:
     font_name = "COMIC SANS MS"
 
     def __init__(self, screen, group, text, size, pos, color=(255, 255, 255), side='center'):
-        print(size)
         self.screen = screen
         group.append(self)
         self.color = color
         self.text_str = text
         self.size = size
-        print(size)
         self.font = pygame.font.SysFont(self.font_name, self.size)
         self.pos = pos
         self.side = side
@@ -190,13 +187,12 @@ class Selector(Shapes):
         self.list_to_display = list_to_display
         self.number = 0
         size = self.define_size()
+        self.arrows_size = (25, 25)
         super().__init__(screen, group, size, pos, color, shape, data, radius, title, title_size, side)
-        self.left_arrow = Button(self.screen, group, (self.size[0] / 2, self.size[1] / 2),
-                                 (self.rect.x - size[0] - 30, self.rect.y), color
-                                 , "rect", [lambda: self.add_number(-1)], side="center")
-        self.right_arrow = Button(self.screen, group, (self.size[0] / 2, self.size[1] / 2),
-                                  (self.rect.x + size[0] + 30, self.rect.y), color
-                                  , "rect", [lambda: self.add_number(1)], side="center")
+        self.left_arrow = Button(self.screen, group, self.arrows_size,
+                                 (0, 0), color, "rect", [lambda: self.add_number(-1)], side="center")
+        self.right_arrow = Button(self.screen, group, self.arrows_size,
+                                  (0, 0), color, "rect", [lambda: self.add_number(1)], side="center")
 
     def define_size(self):
         all_data_size = []
@@ -209,8 +205,8 @@ class Selector(Shapes):
     def draw_all(self):
         self.draw(size=self.define_size())
         self.screen.blit(self.list_to_display[self.number].text, self.rect)
-        self.right_arrow.draw((self.rect.x + self.rect.width + 50, self.rect.centery))
-        self.left_arrow.draw((self.rect.x - 50, self.rect.centery))
+        self.right_arrow.draw((self.rect.x + self.rect.width + self.arrows_size[0], self.rect.centery))
+        self.left_arrow.draw((self.rect.x - self.arrows_size[0], self.rect.centery))
 
     def add_number(self, amount):
         self.number += amount
@@ -232,14 +228,13 @@ class Cursor(Shapes):
     def __init__(self, screen, group, size, pos, color, data: int, scale, title=None, title_size=None, side="center"):
         super().__init__(screen, group, size, pos, (0, 255, 0), "rect", None, 5, title, title_size, side)
         self.bar = Shapes(screen, group, (data * scale, size[1]), (self.rect.x, self.rect.y), color, "rect", None, 5, None, None, "topleft")
-        print("pointer")
         self.pointer = Shapes(screen, group, (20, 20), (self.rect.x + data * scale, self.rect.centery), color, "circle", None, size[0] / 10, None, None, "topleft")
         self.nb = data
         self.is_clicked = False
 
     def draw_all(self):
         self.draw()
-        self.bar.draw()
+        self.bar.draw((self.rect.x, self.rect.y))
         self.pointer.draw()
 
     def check_clicked(self, event):

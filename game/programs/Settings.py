@@ -15,14 +15,13 @@ class Settings:
         self.settings_text = Text(self.screen, [], "Settings", 30, (75, 25), (255, 255, 255))
         self.exit_button = Button(self.screen, [], (40, 50), (30, 50), (255, 255, 255), "rounded rect", [self.stop_settings, mainwindow.run])
 
-        self.line = Shapes(self.screen, self.sprites, (3, self.screen.get_height()), (210, 0), (50, 50, 50), "rect", None, 5, None, None, "topleft")
+        self.line = Shapes(self.screen, [], (3, self.screen.get_height()), (210, 0), (50, 50, 50), "rect", None, 5, None, None, "topleft")
 
-        self.keyboard_selector = Selector(self.screen, self.sprites, (750, 450), (200, 200, 200),
-                                          [Text(self.screen, self.sprites, "QWERTY", 18, (0, 0), (0, 0, 0)), Text(self.screen, self.sprites, "AZERTY", 18, (0, 0), (0, 0, 0))], "rect", title="KEYBOARD", title_size=20)
         self.port_input = Input(self.screen, self.sprites, (150, 25), (750, 150), (200, 200, 200), "rect", "", title="PORT", title_size=20)
         self.adress_input = Input(self.screen, self.sprites, (150, 25), (750, 300), (200, 200, 200), "rect", "", title="ADRESS IP", title_size=20)
-        self.luminosity_cursor = Cursor(self.screen, self.sprites, (150, 10), (750, 800), (200, 200, 200), 20, 1/1, "LUMINOSITY", title_size=20)
-
+        self.keyboard_selector = Selector(self.screen, self.sprites, (750, 450), (200, 200, 200),
+                                          [Text(self.screen, self.sprites, "QWERTY", 18, (0, 0), (0, 0, 0)), Text(self.screen, self.sprites, "AZERTY", 18, (0, 0), (0, 0, 0))], "rect", title="KEYBOARD", title_size=20)
+        self.luminosity_cursor = Cursor(self.screen, self.sprites, (150, 10), (750, 600), (200, 200, 200), 20, 1/1, "LUMINOSITY", title_size=20)
     def draw_bg(self):
         self.screen.fill(self.bg_color)
 
@@ -45,6 +44,7 @@ class Settings:
             self.adress_input.draw()
             self.luminosity_cursor.draw_all()
             self.port_input.draw()
+
             self.keyboard_selector.draw()
             self.keyboard_selector.draw_all()
 
@@ -70,8 +70,8 @@ class Settings:
                 elif event.type == pygame.MOUSEWHEEL:
                     if event.y > 0:
                         for sprite in self.sprites:
-                            sprite.rect.y += 3
+                            sprite.rect.y += 5
                     else:
                         for sprite in self.sprites:
-                            sprite.rect.y -= 3
+                            sprite.rect.y -= 5
 
