@@ -104,6 +104,6 @@ def display_map(map_data):
 
 
 # Example usage
-seed = 51931
+seed = 52
 map_data = generate_map(seed)
 display_map(map_data)

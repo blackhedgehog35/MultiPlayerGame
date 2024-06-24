@@ -10,7 +10,7 @@ class ConfigFile(configparser.ConfigParser):
         self.data_file = self.read(self.file)
 
     def get_screen_size(self):
-        return self.getint('DEFAULT', 'width'), self.getint('DEFAULT', 'height')
+        return self.getint('SCREEN', 'width'), self.getint('SCREEN', 'height')
 
     def get_host(self):
         address = self.get('SERVER', 'address')
