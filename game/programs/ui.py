@@ -96,8 +96,7 @@ class Text:
         self.text = self.font.render(str(self.text_str), True, self.color)
         self.width, self.heigth = self.text.get_size()
         self.rect = self.text.get_rect()
-        self.rect.x = pos[0]
-        self.rect.y = pos[1]
+        self.update_pos(pos)
 
 
     def update_text(self, text_str):
@@ -141,6 +140,7 @@ class Input(Shapes):
 
     def write(self, key_pressed):
         if key_pressed == pygame.K_BACKSPACE:
+            # we replace the variable with the same variable but without the last letter
             self.data_text = self.data_text[0:-1]
 
         elif self.data.text.get_size()[0] + 20 < self.size[0] and key_pressed < 110000:
@@ -161,7 +161,7 @@ class Input(Shapes):
         if self.is_writing:
             self.write(event.key)
 
-    def update_data(self, data):
+    def get_data(self, data):
         data = self.data.text_str
 
 
@@ -203,7 +203,7 @@ class Selector(Shapes):
         return all_data_size[self.number]
 
     def draw_all(self):
-        self.draw(size=self.define_size())
+        self.draw(size=self.define_size())        # its size depends on the displayed word's size
         self.screen.blit(self.list_to_display[self.number].text, self.rect)
         self.right_arrow.draw((self.rect.x + self.rect.width + self.arrows_size[0], self.rect.centery))
         self.left_arrow.draw((self.rect.x - self.arrows_size[0], self.rect.centery))
@@ -215,7 +215,7 @@ class Selector(Shapes):
         elif self.number <= -1:
             self.number = len(self.list_to_display) - 1
 
-    def get_diplayed_value(self, data):
+    def get_displayed_value(self, data):
         data = self.list_to_display[self.number]
 
     def check_arrows_clicked(self, event):
@@ -227,9 +227,10 @@ class Cursor(Shapes):
 
     def __init__(self, screen, group, size, pos, color, data: int, scale, title=None, title_size=None, side="center"):
         super().__init__(screen, group, size, pos, (0, 255, 0), "rect", None, 5, title, title_size, side)
-        self.bar = Shapes(screen, group, (data * scale, size[1]), (self.rect.x, self.rect.y), color, "rect", None, 5, None, None, "topleft")
-        self.pointer = Shapes(screen, group, (20, 20), (self.rect.x + data * scale, self.rect.centery), color, "circle", None, size[0] / 10, None, None, "topleft")
-        self.nb = data
+        self.bar = Shapes(screen, group, (data, size[1]), (self.rect.x, self.rect.y), color, "rect", None, 5, None, None, "topleft")
+        self.pointer = Shapes(screen, group, (20, 20), (self.rect.x + data, self.rect.centery), color, "circle", None, size[0] / 10, None, None, "topleft")
+        self.scale = scale
+        self.nb = data * self.scale
         self.is_clicked = False
 
     def draw_all(self):
@@ -250,5 +251,5 @@ class Cursor(Shapes):
         x, y = event.pos
         if self.is_clicked:
             self.pointer.rect.x = x
-            self.nb = x - self.rect.x
-            self.bar.update_size((self.nb, self.rect.height))
+            self.nb = (x - self.rect.x) * self.scale
+            self.bar.update_size(((x - self.rect.x), self.rect.height))

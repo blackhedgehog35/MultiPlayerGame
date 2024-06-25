@@ -47,7 +47,6 @@ class MainWindow:
                         self.stop_menu()
                         host, port = ConfigFile().get_host()
                         Level(self.screen, ClientNetwork(host=host, port=port)).run()
-
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     self.settings_button.check_clicked(event)
 
