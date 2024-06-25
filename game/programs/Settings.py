@@ -2,6 +2,30 @@ import pygame.sprite
 
 from ui import *
 
+"""
+Si t'y arrive, c'est parfait ! Je te met tout les trucs que j'ai remarqué mais bien évidemeent tu le fais quand tu veux et pas forcément dans l'ordre:
+menu : 
+- Présentation :
+	- sorte de ligne à gauche à enlever car une seul page
+	- Titre de section en grand au centre, en gras
+	- disposition horizontal pour le nom de la variable et son input
+	- Faire un truc un minimum centrer, avec system de container au centre pour mettre le nom des variables le + à gauche, et les inputs le plus à droite
+	
+	- Changer le design pour avoir un truc moins brute mais ça pourra être fait plus tard
+	- Ne pas centrer le texte dans les inputs, choisir de les mettres à gauche ou à droite suivant ce que c'est
+- UX :
+	- Il faut faire en sorte qu'on ne puisse plus scroller quand c'est bon
+	- Mettre une scroll bar quand tout ne tiendra plus sur une seul page. Sinon ne pas l'afficher.
+	- Mettre une sorte de bar qui clignote dans les inputs pour faire comprendre qu'on peut saisir OU mettre le input en subriance comme les composants web
+	- Interdire les charactères spéciaux
+	- Enlever le exit button et mettre à la place un bouton échap qui fait que quand on veut sortir, on appuie sur Échap.
+	
+- Fonctionnement :
+	- Connecter ça au config.ini
+	- Problème pour mettre les points dans le input address
+	- Mettre une clock pour limiter les FPS
+"""
+
 
 class Settings:
 
