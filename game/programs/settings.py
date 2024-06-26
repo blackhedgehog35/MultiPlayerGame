@@ -11,7 +11,7 @@ class Text(pygame.sprite.Sprite):
         super().__init__()
         self.str = text
 
-        self.font = pygame.font.SysFont(self.config_file.get('FONT', 'font-family'), int(size), bold=bold)
+        font = pygame.font.SysFont(self.config_file.get('FONT', 'font-family'), int(size), bold=bold)
         self.color = color
         self.pos = pos
         self.side = side
@@ -38,6 +38,8 @@ class Input(pygame.sprite.Sprite):
     config_file = config.ConfigFile()
     padding = {"between rect and text": {"x": 4, "y": 3}}
     authorized_char = ""
+    min_char_value = 0
+    max_char_value = 0
     """
     (48, 58) --> 0123456789
     (97, 123) --> abc...xyz
@@ -45,34 +47,45 @@ class Input(pygame.sprite.Sprite):
     46 --> .
     """
 
-    def __init__(self, default_text, text_size, color: tuple, pos, max_character=8, authorized_char=((48, 58), (97, 123),
-                                                                                                     (65, 91), 46),
+    def __init__(self, default_text, text_size, colors: tuple, pos, max_character=8, authorized_char=((48, 58), (97, 123),
+                                                                                                          (65, 91), 46),
                  side="topleft", text_side="left"):
         super().__init__()
-        self.max_character = max_character
+        self.default_text = default_text
         self.text_size = text_size
-        self.rect_color, color = color
-        self.text = Text(default_text, text_size, color, pos)
+        self.rect_color, text_color = colors
+        self.pos = pos
+        self.max_character = max_character
         self.get_authorized_char(authorized_char)
+        self.side = side
+        self.text_side = text_side
+
+        self.text = Text(default_text, text_size, text_color, pos, side=f"bottom{self.text_side}")
         char_x_size, char_y_size = self.found_size()
-        print(self.authorized_char)
-        print(self.found_size())
-        self.rect = pygame.rect.Rect(0, 0, char_x_size * self.max_character + 2 *
-                                     self.padding["between rect and text"]["x"], char_y_size + 2 *
-                                     self.padding["between rect and text"]["y"])
-        setattr(self.rect, side, pos)
+        self.rect = pygame.rect.Rect(0, 0,
+                                     char_x_size * self.max_character + 2 * self.padding["between rect and text"]["x"],
+                                     char_y_size + 2 * self.padding["between rect and text"]["y"])
 
+        setattr(self.rect, self.side, self.pos)
+
+        d = -1 if text_side == 'right' else 1
         setattr(self.text.rect, f"bottom{text_side}", (getattr(self.rect, text_side) +
-                                                       self.padding["between rect and text"]["x"],
+                                                       self.padding["between rect and text"]["x"] * d,
                                                        self.rect.bottom + self.padding["between rect and text"]["y"]))
+        self.text.update_text(default_text)
 
-    def get_authorized_char(self, chr_value):
-        for value in chr_value:
+    def get_authorized_char(self, chr_values):
+        for value in chr_values:
             try:
                 start, end = value
                 for i in range(start, end):
+                    self.min_char_value = min(self.min_char_value, i)
+                    self.max_char_value = min(self.max_char_value, i)
                     self.authorized_char += chr(i)
             except TypeError:
+                self.min_char_value = min(self.min_char_value, value)
+                self.max_char_value = min(self.max_char_value, value)
+
                 self.authorized_char += chr(value)
 
     def found_size(self):
@@ -86,6 +99,19 @@ class Input(pygame.sprite.Sprite):
     def draw(self, surface):
         pygame.draw.rect(surface, self.rect_color, self.rect, border_radius=5)
         surface.blit(self.text.image, self.text.rect)
+
+    def write(self, key_pressed):
+        value = self.text.str
+
+        if key_pressed == pygame.K_BACKSPACE:
+            # we replace the variable with the same variable but without the last letter
+            value = value[0:-1]
+        elif self.min_char_value <= key_pressed <= self.max_char_value:
+            if chr(key_pressed) in self.authorized_char:
+                value += chr(key_pressed)
+                print('TATA')
+
+        self.text.update_text(value)
 
 
 class Settings:
@@ -107,11 +133,10 @@ class Settings:
                                                self.screen_size[0] - self.margin["container"]["left"] -
                                                self.margin["container"]["right"],
                                                self.screen_size[1] - self.margin["container"]["top"])
-        self.input = Input("test", 40, ("white", 'black'), (self.main_container.right, 200), max_character=4,
-                           side="topright", text_side="right")
+
         self.clock = pygame.time.Clock()
         self.get_settings_sections()
-        self.text_group = pygame.sprite.Group()
+        self.component_group = pygame.sprite.Group()
         for section in self.get_settings_sections():
             self.add_section(section)
 
@@ -127,12 +152,13 @@ class Settings:
 
     def get_last_rect(self):
         c = self.margin['container']['top']
-        for text in self.text_group.sprites():
+        for text in self.component_group.sprites():
             c = max(c, text.rect.bottom)
         return c
 
     def add_section(self, section_name):
         section_title = section_name
+
         if "--SETTINGS" in section_name:
             section_title = section_name.replace("--SETTINGS", "")
 
@@ -141,14 +167,22 @@ class Settings:
         title_text = Text(section_title, self.config_file.getint('FONT', 'title-size'), (255, 255, 255), pos,
                           side='midtop', bold=True)
 
-        self.text_group.add(title_text)
+        self.component_group.add(title_text)
 
         for variable_name in self.config_file.options(section_name):
-            text = Text(f"{variable_name} :".upper(), self.config_file.getint('FONT', 'body-size'),
-                        (255, 255, 255), (self.margin['container']['left'], self.get_last_rect() +
+            _text = Text(f"{variable_name} :".upper(), self.config_file.getint('FONT', 'body-size'),
+                        (255, 255, 255), (self.main_container.left, self.get_last_rect() +
                                           self.margin['between']['variable']), side="topleft")
+            try:
+                variable_value = self.config_file.getint(section_name, variable_name)
+            except ValueError:
+                variable_value = self.config_file.get(section_name, variable_name)
 
-            self.text_group.add(text)
+            _input = Input(f"{variable_value}".upper(), self.config_file.getint('FONT', 'body-size'),
+                           ("white", "black"), (self.main_container.right, _text.rect.centery), side="midright",
+                           text_side="right", max_character=len(str(variable_value)) + 1)
+            self.component_group.add(_text)
+            self.component_group.add(_input)
 
     def run(self):
         running = True
@@ -163,10 +197,14 @@ class Settings:
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         running = False
+                    else:
+                        for component in self.component_group.sprites():
+                            if isinstance(component, Input):
+                                component.write(event.key)
+                                break
 
-            for text in self.text_group.sprites():
-                text.draw(self.screen)
-            self.input.draw(self.screen)
+            for component in self.component_group.sprites():
+                component.draw(self.screen)
             # Update the display
             pygame.display.flip()
 
