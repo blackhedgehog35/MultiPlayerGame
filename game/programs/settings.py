@@ -11,7 +11,7 @@ class Text(pygame.sprite.Sprite):
         super().__init__()
         self.str = text
 
-        font = pygame.font.SysFont(self.config_file.get('FONT', 'font-family'), int(size), bold=bold)
+        self.font = pygame.font.SysFont(self.config_file.get('FONT', 'font-family'), int(size), bold=bold)
         self.color = color
         self.pos = pos
         self.side = side
@@ -39,7 +39,8 @@ class Input(pygame.sprite.Sprite):
     padding = {"between rect and text": {"x": 4, "y": 3}}
     authorized_char = ""
     min_char_value = 0
-    max_char_value = 0
+    max_char_value = 11100
+    is_writing = False
     """
     (48, 58) --> 0123456789
     (97, 123) --> abc...xyz
@@ -75,6 +76,7 @@ class Input(pygame.sprite.Sprite):
         self.text.update_text(default_text)
 
     def get_authorized_char(self, chr_values):
+
         for value in chr_values:
             try:
                 start, end = value
@@ -101,17 +103,25 @@ class Input(pygame.sprite.Sprite):
         surface.blit(self.text.image, self.text.rect)
 
     def write(self, key_pressed):
-        value = self.text.str
+        if self.is_writing:
+            value = self.text.str
 
-        if key_pressed == pygame.K_BACKSPACE:
-            # we replace the variable with the same variable but without the last letter
-            value = value[0:-1]
-        elif self.min_char_value <= key_pressed <= self.max_char_value:
-            if chr(key_pressed) in self.authorized_char:
-                value += chr(key_pressed)
-                print('TATA')
+            if key_pressed == pygame.K_BACKSPACE:
+                # we replace the variable with the same variable but without the last letter
+                value = value[0:-1]
 
-        self.text.update_text(value)
+            elif self.min_char_value <= key_pressed <= self.max_char_value:
+                if chr(key_pressed) in self.authorized_char:
+                    value += chr(key_pressed)
+                    print('TATA')
+
+            self.text.update_text(value)
+
+    def check_clicked(self, event):
+        if self.rect.collidepoint(event.pos):
+            self.is_writing = True
+        else:
+            self.is_writing = False
 
 
 class Settings:
@@ -202,6 +212,12 @@ class Settings:
                             if isinstance(component, Input):
                                 component.write(event.key)
                                 break
+
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    for component in self.component_group.sprites():
+                        if isinstance(component, Input):
+                            component.check_clicked(event)
+
 
             for component in self.component_group.sprites():
                 component.draw(self.screen)

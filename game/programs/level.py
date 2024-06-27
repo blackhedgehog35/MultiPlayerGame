@@ -7,7 +7,7 @@ from ui import show_info
 
 
 class Level:
-    FPS = ConfigFile().getint('DEFAULT', 'FPS')
+    FPS = ConfigFile().getint('SCREEN--SETTINGS', 'FPS')
 
     def __init__(self, screen, connection: ClientNetwork):
         self.conn = connection
