@@ -13,8 +13,8 @@ class ConfigFile(configparser.ConfigParser):
         return self.getint('SCREEN', 'width'), self.getint('SCREEN', 'height')
 
     def get_host(self):
-        address = self.get('SERVER', 'address')
-        port = self.getint('SERVER', 'port')
+        address = self.get('SERVER--SETTINGS', 'address')
+        port = self.getint('SERVER--SETTINGS', 'port')
         return address, port
 
     def edit_value(self, section, option, value):

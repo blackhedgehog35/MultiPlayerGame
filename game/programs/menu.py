@@ -1,7 +1,7 @@
 import pygame
 from ui import Text, Button
 from level import Level
-from settings import Settings
+from Settings import Settings
 from client import ClientNetwork
 from config import ConfigFile
 
@@ -18,7 +18,7 @@ class MainWindow:
         self.game = None
         self.text = Text(self.screen, self.sprites, 'Press <Ctrl> and <Tab> to start the game', 50, (self.width / 2, self.height / 2), 'black')
         self.settings_button = Button(self.screen, self.sprites, (75, 75), (self.width - 100, self.height - 100), (0, 0, 0), "rounded rect", [self.stop_menu,
-                        Settings(self.screen).run],  Text(self.screen, self.sprites, "Settings", 15, (0, 0), (255, 255, 255), "center"))
+                        Settings(self.screen, self).run],  Text(self.screen, self.sprites, "Settings", 15, (0, 0), (255, 255, 255), "center"))
 
     def draw_background(self):
         self.screen.fill(self.background_color)
