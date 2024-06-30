@@ -17,7 +17,14 @@ class ConfigFile(configparser.ConfigParser):
         port = self.getint('SERVER--SETTINGS', 'port')
         return address, port
 
+    def get_key(self):
+        return self.get("SERVER", 'key')
+
     def edit_value(self, section, option, value):
         self.set(section=section, option=option, value=value)
         with open(self.file, 'w') as configfile:
             self.write(configfile)
+
+
+if __name__ == '__main__':
+    print(ConfigFile().get_key())

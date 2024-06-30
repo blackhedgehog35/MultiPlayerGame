@@ -92,6 +92,7 @@ class InputTest(pygame.sprite.Sprite):
     config_file = config.ConfigFile()
     padding = {"between rect and text": {"x": 4, "y": 3}}
     is_writing = False
+    border_radius = 5
 
     """
     (48, 58) --> 0123456789
@@ -122,6 +123,9 @@ class InputTest(pygame.sprite.Sprite):
             self.rect.bottom - self.padding['between rect and text']['y']
         ), "bottomright")
         self.write(pygame.K_BACKSPACE)
+        self.hover_border_radius = 0 if self.border_radius == 0 else (
+                self.border_radius - min(self.padding['between rect and text']['x'],
+                                         self.padding['between rect and text']['y']))
 
     @staticmethod
     def get_authorized_char(chr_values):
@@ -182,9 +186,9 @@ class InputTest(pygame.sprite.Sprite):
             self.text.update_text(value)
 
     def draw(self, surface):
-        pygame.draw.rect(surface, self.rect_color, self.rect, border_radius=5)
+        pygame.draw.rect(surface, self.rect_color, self.rect, border_radius=self.border_radius)
         if self.is_writing:
-            pygame.draw.rect(surface, "brown", self.text.rect)
+            pygame.draw.rect(surface, "brown", self.text.rect, border_radius=self.hover_border_radius)
         surface.blit(self.text.image, self.text.rect)
 
 
@@ -196,12 +200,12 @@ class Settings:
     margin = {'container': {"top": 55, "bottom": screen_size[1] - 100, "left": 240, "right": 240},
               "between": {"title": 70, "variable": 40}}
 
-    def __init__(self, screen: pygame.surface.Surface = None):
+    def __init__(self, screen: pygame.surface.Surface):
         # Initialize Pygame
         pygame.init()
 
         # Set up the display
-        self.screen = screen if screen else pygame.display.set_mode(self.screen_size)
+        self.screen = screen
         pygame.display.set_caption("Settings")
 
         self.main_container = pygame.rect.Rect(self.margin["container"]["left"], self.margin["container"]["top"],
@@ -290,8 +294,7 @@ class Settings:
             # Update the display
             pygame.display.flip()
         self.save()
-        pygame.quit()
 
 
 if __name__ == '__main__':
-    Settings().run()
+    Settings(pygame.display.set_mode(config.ConfigFile().get_screen_size())).run()
