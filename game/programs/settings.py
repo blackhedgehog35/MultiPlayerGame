@@ -16,6 +16,13 @@ class MainContainerGroup(pygame.sprite.Group):
         #  camera offset
         self.offset = pygame.math.Vector2()
 
+    def inputs(self) -> list:
+        input_list = []
+        for sprite in self.sprites():
+            if isinstance(sprite, Input):
+                input_list.append(sprite)
+        return input_list
+
     def scroll(self, event_y):
 
         self.offset.y = event_y * self.scroll_intensity
@@ -39,15 +46,14 @@ class MainContainerGroup(pygame.sprite.Group):
             component.draw(self.screen)
 
     def custom_selector(self):
-
         mouse_x, mouse_y = pygame.mouse.get_pos()
         for component in self.sprites():
-            if isinstance(component, InputTest):
+            if isinstance(component, Input):
                 if component.rect.collidepoint(mouse_x, mouse_y):
                     component.is_writing = True
                     self.current_input_selected = component
         for component in self.sprites():
-            if isinstance(component, InputTest):
+            if isinstance(component, Input):
                 if component == self.current_input_selected:
                     pass
                 else:
@@ -88,7 +94,7 @@ class Text(pygame.sprite.Sprite):
         surface.blit(self.image, self.rect)
 
 
-class InputTest(pygame.sprite.Sprite):
+class Input(pygame.sprite.Sprite):
     config_file = config.ConfigFile()
     padding = {"between rect and text": {"x": 4, "y": 3}}
     is_writing = False
@@ -256,20 +262,50 @@ class Settings:
             except ValueError:
                 variable_value = self.config_file.get(section_name, variable_name)
                 authorized_char = ((48, 58), 46)
-            _input = InputTest(f"{variable_value}".upper(), text_size, ("white", "black"),
-                               (self.main_container.right, _text.rect.centery),
-                               max_character=len(str(variable_value)) + 1, authorized_char=authorized_char,
-                               _id=f"{section_name}|{variable_name}")
+            _input = Input(f"{variable_value}".upper(), text_size, ("white", "black"),
+                           (self.main_container.right, _text.rect.centery),
+                           max_character=len(str(variable_value)) + 1, authorized_char=authorized_char,
+                           _id=f"{section_name}|{variable_name}")
             self.main_container_group.add(_text)
             self.main_container_group.add(_input)
 
     def save(self):
-        for component in self.main_container_group.sprites():
-            if isinstance(component, InputTest):
-                section, option = component.id.split("|")
-                self.config_file.edit_value(section, option, component.text.str)
+        for input_component in self.main_container_group.inputs():
+            section, option = input_component.id.split("|")
+            self.config_file.edit_value(section, option, input_component.text.str)
 
-    def run(self):
+    def verify_input_values(self) -> bool:
+        #  Je vais vérifier un peu à la main si chaque valeur des inputs est respecter, donc pour ça je vais faire plein
+        #  de if else et dès qu'une valeur n'est pas correct, alors result = False. Si en fin de boucle result est encore=True
+        #  alors c'est que tout les vérifications sont passé.
+        result = True
+        for input_component in self.main_container_group.inputs():
+            section, option = input_component.id.split("|")
+            if option == "fps":
+                try:
+                    if not 30 <= int(input_component.text.str) <= 144:
+                        result = False
+                # Si il y a une exception ValueError, c'est à cause du int() et alors ça veut dire que le champ
+                # comporte du texte
+                except ValueError:
+                    result = False
+            elif option == "address":
+                #  Pour l'adresse, on vérifie juste si ça ne commence ou ne termine pas par un point
+                #  On regarde également si les valeurs des adresses ip sont bien entre 0 et 255 compris.
+                #  On vérifie bien sur que c'est des int et pas des str
+                value_split = input_component.text.str.split(".")
+                if input_component.text.str[0] == "." or input_component.text.str[-1] == ".":
+                    result = False
+                for value in value_split:
+                    try:
+                        if not 0 <= int(value) <= 255:
+                            result = False
+                            break
+                    except ValueError:
+                        result = False
+                        break
+
+    def run(self) -> None:
         running = True
         while running:
             self.draw_bg()
@@ -284,7 +320,7 @@ class Settings:
                         running = False
                     else:
                         for component in self.main_container_group.sprites():
-                            if isinstance(component, InputTest):
+                            if isinstance(component, Input):
                                 component.write(event.key)
                 elif event.type == pygame.MOUSEWHEEL:
                     self.main_container_group.scroll(event.y)

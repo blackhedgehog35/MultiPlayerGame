@@ -9,6 +9,11 @@ Objet ConfigFile à revoir : ce serai plus simple que les attributs, on les ai e
 et qu'à chaque fois qu'on veut être sur que ça ai pris les dernières modifications, on met un methode update()
 pour être sûr que toute les variabes ont bien les bonnes valeurs. J'ai comme l'impression que ça commence à être
 un meli-melo mdr. 
+Ajouter les touches dans settings.py
+- Créer un input spécial où on ne pourrai mettre qu'une valeur et lorsque on clique sur l'input, il y aurai écrit
+"Press a key"
+- Faire un truc qui vérifie que les valeurs dans les inputs sont bien, sinon pour le moment, ne pas modifier les settings,
+puis mettre un message pour dire à l'utilisateur que les valeurs sont incorrect.
 
 """
 
