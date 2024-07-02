@@ -2,12 +2,39 @@ import configparser
 from os.path import join
 
 
+class Key:
+    top: int
+    bottom: int
+    right: int
+    left: int
+
+    attack1: int
+    action2: int
+    action3: int
+
+
 class ConfigFile(configparser.ConfigParser):
     file = join('..', 'config.ini')
+    key = Key()
 
     def __init__(self):
         super().__init__()
-        self.data_file = self.read(self.file)
+        self.update()
+
+    def get_font_name(self):
+        return self.get('FONT', 'family')
+
+    def get_body_size(self):
+        return self.getint('FONT', 'body-size')
+
+    def get_title_size(self):
+        return self.getint('FONT', 'title-size')
+
+    def update(self):
+        self.read(self.file)
+        for section in ['DIRECTION--SETTINGS', 'ACTIONS--SETTINGS']:
+            for option in self.options(section):
+                setattr(self.key, option.replace(" ", ""), self.getint(section, option))
 
     def get_screen_size(self):
         return self.getint('SCREEN', 'width'), self.getint('SCREEN', 'height')

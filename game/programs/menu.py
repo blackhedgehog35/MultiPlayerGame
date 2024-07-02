@@ -38,7 +38,7 @@ class MainWindow:
 
     def refresh_page(self):
         pygame.display.set_caption('MENU - MULTIPLAYER GAME')
-        self.config_file = ConfigFile()
+        self.config_file.update()
         address, port = self.config_file.get_host()
         self.FPS = self.config_file.getint("SCREEN--SETTINGS", "fps")
         self.host_text.update_text(f"{address}:{port}")
