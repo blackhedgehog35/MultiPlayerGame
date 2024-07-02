@@ -62,6 +62,7 @@ class Level:
                                                     self.all_sprites.find(self.conn.KEY).rect.y))
             self.update(dt, server_game)
             pygame.display.flip()
+        self.config_file.save_key(self.conn.KEY)
 
 
 if __name__ == '__main__':
