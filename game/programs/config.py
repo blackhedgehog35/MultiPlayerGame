@@ -61,7 +61,3 @@ class ConfigFile(configparser.ConfigParser):
         self.set("SERVER", "key", key)
         with open(self.file, "w") as configfile:
             self.write(configfile)
-
-
-if __name__ == '__main__':
-    print(ConfigFile().get_key())

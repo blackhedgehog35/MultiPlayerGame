@@ -2,8 +2,6 @@ import sys
 import pygame
 import config
 
-pygame.init()
-
 
 class MainContainerGroup(pygame.sprite.Group):
     scroll_intensity = 20
@@ -305,12 +303,10 @@ class Settings:
     margin = {'container': {"top": 55, "bottom": screen_size[1] - 100, "left": 240, "right": 240},
               "between": {"title": 70, "variable": 40}}
 
-    def __init__(self, screen: pygame.surface.Surface):
-        # Initialize Pygame
+    def __init__(self, screen: pygame.surface.Surface = None):
         pygame.init()
+        self.screen = screen if screen else pygame.display.set_mode(self.config_file.get_screen_size())
 
-        # Set up the display
-        self.screen = screen
         pygame.display.set_caption("Settings")
 
         self.main_container = pygame.rect.Rect(self.margin["container"]["left"], self.margin["container"]["top"],

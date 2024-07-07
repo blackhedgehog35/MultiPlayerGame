@@ -13,12 +13,12 @@ class Level:
     key = config_file.get_key()
 
     def __init__(self, screen=None, connection: ClientNetwork = None):
-        self.conn = connection if connection else ClientNetwork(self.address, self.port, key=self.key)
-        self.screen = screen if screen else pygame.display.set_mode(self.config_file.get_screen_size())
         pygame.init()
+        self.screen = screen if screen else pygame.display.set_mode(self.config_file.get_screen_size())
+        self.conn = connection if connection else ClientNetwork(self.address, self.port, key=self.key)
         pygame.display.set_caption('')
+
         self.clock = pygame.time.Clock()
-        #  self.sprites = {self.conn.KEY: Player(self.conn.KEY, self.conn.spawn_pos)}
         self.all_sprites = CustomSpriteGroup()
         self.all_sprites.add(Sprite(self.conn.KEY, self.conn.spawn_pos, self.all_sprites))
 

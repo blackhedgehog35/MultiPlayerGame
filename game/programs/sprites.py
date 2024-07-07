@@ -47,7 +47,7 @@ class CustomSpriteGroup(pygame.sprite.Group):
 
     def custom_draw(self, player):
         self.box_target_camera(player)
-        for sprite in sorted(self.sprites(), key=lambda sprite: sprite.rect.centery):
+        for sprite in sorted(self.sprites(), key=lambda sprite_targeted: sprite_targeted.rect.centery):
             offset_pos = sprite.rect.topleft - self.offset
             sprite.draw(offset_pos)
 
