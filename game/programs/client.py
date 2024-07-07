@@ -40,6 +40,9 @@ class ServerClosed(Exception):
 
 
 class ClientNetwork:
+    #  A variable to know if the connection is done between the server and the client
+    connected = False
+
     """
     It is this class which will manage the connections between the server and the client, client part.
     This class must be initialized in the init, after the connection is made, a key will be stored in the KEY variable.
@@ -71,6 +74,8 @@ class ClientNetwork:
             raise ServerNoFound(self.HOST, self.PORT)
         except OSError:
             raise ServerNoFound(self.HOST, self.PORT)
+        else:
+            self.connected = True
 
     #  This is the function to send information
     def send(self, data):

@@ -1,3 +1,4 @@
+import sys
 import pygame
 import config
 
@@ -73,7 +74,7 @@ class MainContainerGroup(pygame.sprite.Group):
             if isinstance(component, OneKeyInput):
                 if component.clicked:
                     list_component.append(component)
-                    #  break because in theory, there is just one component that is activate
+                    #  break because in theory, there is just one component that is activated
                     break
         return list_component
 
@@ -216,16 +217,6 @@ class Input(pygame.sprite.Sprite):
         surface.blit(self.text.image, self.text.rect)
 
 
-"""
-Pour le OneKeyInput, ce que je veux :
-Si aucune valeur au tout début, j'aimerai qu'il y ai marqué "Press a key" par défault, et lorsqu'on survole (à la façon 
-du input) ce soit sélectionner et genre là si on appuie sur une touche alors ça écrive cette touche et c'est plus sélectionné
-À partir de là, quand on survole ça met le petit truc de couleur comme d'hab mais quand pn clique, ça repasse en mode "Press a key".
-Quand on sort du rectangle, si on clique pas ça reste encore en "Press a key" mais dès qu'on clique en dehors du rectangle,
-ça remet la valeur d'avant. Je sais pas si c'est très clair...
-"""
-
-
 class OneKeyInput(pygame.sprite.Sprite):
     config_file = config.ConfigFile()
     special_values = {pygame.K_RIGHT: 'right arrow', pygame.K_LEFT: 'left arrow',
@@ -313,8 +304,6 @@ class Settings:
     #  Container : Top, left, right
     margin = {'container': {"top": 55, "bottom": screen_size[1] - 100, "left": 240, "right": 240},
               "between": {"title": 70, "variable": 40}}
-    char = {}
-    special_char = []
 
     def __init__(self, screen: pygame.surface.Surface):
         # Initialize Pygame
@@ -336,7 +325,6 @@ class Settings:
         for section in self.get_settings_sections():
             self.add_section(section)
 
-        pos = list(self.main_container_group.inputs())[0].pos
         self.main_container.height = self.main_container_group.get_last_rect_y() - self.margin['container']['top']
 
     def get_settings_sections(self):
@@ -387,24 +375,27 @@ class Settings:
                                      (self.main_container.right, _text.rect.centery), f"{section_name}|{variable_name}")
             else:
                 _input = Input(f"{variable_value}".upper(), self.config_file.get_body_size(), ("white", "black"),
-                           (self.main_container.right, _text.rect.centery),
-                           max_character=max_character, authorized_char=authorized_char,
-                           _id=f"{section_name}|{variable_name}")
+                               (self.main_container.right, _text.rect.centery),
+                               max_character=max_character, authorized_char=authorized_char,
+                               _id=f"{section_name}|{variable_name}")
             self.main_container_group.add(_text)
             self.main_container_group.add(_input)
 
     def save(self):
-        for input_component in self.main_container_group.inputs():
-            section, option = input_component.id.split("|")
-            self.config_file.edit_value(section, option, input_component.text.str)
-        for input_key in self.main_container_group.input_key():
-            section, option = input_key.id.split("|")
-            self.config_file.edit_value(section, option, str(input_key.value))
+        if self.verify_input_values():
+            for input_component in self.main_container_group.inputs():
+                section, option = input_component.id.split("|")
+                self.config_file.edit_value(section, option, input_component.text.str)
+            for input_key in self.main_container_group.input_key():
+                section, option = input_key.id.split("|")
+                self.config_file.edit_value(section, option, str(input_key.value))
+        else:
+            print("Values Not Correct")
 
     def verify_input_values(self) -> bool:
-        #  Je vais vérifier un peu à la main si chaque valeur des inputs est respecter, donc pour ça je vais faire plein
-        #  de if else et dès qu'une valeur n'est pas correct, alors result = False. Si en fin de boucle result est encore=True
-        #  alors c'est que tout les vérifications sont passé.
+        #  I'm going to check a little by hand if each value of the inputs is respected, so for that I'm going to do
+        #  lots of if else and as soon as a value is not correct, then result = False. If at the end of the loop result
+        #  is still=True then all the checks have passed.
         result = True
         for input_component in self.main_container_group.inputs():
             section, option = input_component.id.split("|")
@@ -412,19 +403,18 @@ class Settings:
                 try:
                     if not 20 <= int(input_component.text.str) <= 144:
                         result = False
-                # Si il y a une exception ValueError, c'est à cause du int() et alors ça veut dire que le champ
-                # comporte du texte
+                #  If there is a ValueError exception, it is because of int() and then it means that the field contains
+                #  text
                 except ValueError:
                     result = False
             elif option == "address":
-                #  Pour l'adresse, on vérifie juste si ça ne commence ou ne termine pas par un point
-                #  On regarde également si les valeurs des adresses ip sont bien entre 0 et 255 compris.
-                #  On vérifie bien sur que c'est des int et pas des str
+                #  For the address, we just check if it doesn't start or end with a period. We also check if the values
+                #  of the IP addresses are between 0 and 255 inclusive. We check of course that they are int and not str
                 value_split = input_component.text.str.split(".")
                 if input_component.text.str[0] == "." or input_component.text.str[-1] == ".":
                     result = False
-                #  Une adresse ip est composé de 4 numéros de 0 à 255 séparé par un point donc le plus court c'est
-                #  0.0.0.0 et le plus long c'est 255.255.255.255
+                #  An IP address is made up of 4 numbers from 0 to 255 separated by a dot, so the shortest is 0.0.0.0
+                #  and the longest is 255.255.255.255
                 elif not 7 <= len(input_component.text.str) <= 15:
                     result = False
                 elif "." not in input_component.text.str:
@@ -445,8 +435,8 @@ class Settings:
                 try:
                     if not 10 ** 2 <= int(input_component.text.str) <= 10 ** 5:
                         result = False
-                # Si il y a une exception ValueError, c'est à cause du int() et alors ça veut dire que le champ
-                # comporte du texte
+                #  If there is a ValueError exception, it is because of int() and then it means that the field contains
+                #  text
                 except ValueError:
                     result = False
 
@@ -461,7 +451,9 @@ class Settings:
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    running = False
+                    self.save()
+                    pygame.quit()
+                    sys.exit()
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         running = False
@@ -482,10 +474,7 @@ class Settings:
             # Update the display
             pygame.display.flip()
 
-        if self.verify_input_values():
-            self.save()
-        else:
-            print("Values Not Correct")
+        self.save()
 
 
 if __name__ == '__main__':

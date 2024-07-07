@@ -5,27 +5,6 @@ import miniupnpc
 import threading
 import server.programs.client
 import server.programs.function
-"""
-        if self.public_ip:
-            custom_print("Public IP Address:", self.public_ip)
-        else:
-            custom_print("[ERROR]", "Cannot take public address")
-        self.local_ip = get_local_ip()
-        if self.local_ip:
-            custom_print("Local IP Address:", self.local_ip)
-        else:
-            custom_print("[ERROR]", "Cannot take local address")
-        try:
-            self.server_socket.bind((self.public_ip, self.PORT))
-            self.HOST = self.public_ip
-        except OSError:
-            try:
-                self.server_socket.bind((self.local_ip, self.PORT))
-                self.HOST = self.local_ip
-            except OSError:
-                self.server_socket.bind(('127.0.0.1', self.PORT))
-                self.HOST = '127.0.0.1'
-                """
 
 
 class Server:
@@ -37,9 +16,16 @@ class Server:
         self.server_socket.bind(('', 0))
 
         self.PORT = self.server_socket.getsockname()[1]
-        self.HOST = self.setup_upnp_port_mapping()
+        try:
+            self.HOST = self.setup_upnp_port_mapping()
+        except Exception:
+            server.programs.function.custom_print('[ERROR]', 'cannot open connection.')
+            sys.exit()
+
         server.programs.function.custom_print("Public IP Address:", self.HOST)
         server.programs.function.custom_print("Public IP Port:", self.PORT)
+        self.threads = []
+        self.stop_event = threading.Event()
 
     def setup_upnp_port_mapping(self):
         upnp = miniupnpc.UPnP()
@@ -74,6 +60,8 @@ class Server:
             message = input('')
             if message.lower() in ['world', 'echo', 'print']:
                 print(self.world)
+            elif message.lower() in ['test']:
+                self.stop_server()
 
     def start(self):
         self.server_socket.listen()
@@ -87,3 +75,10 @@ class Server:
             print()
             server.programs.function.custom_print('[CONNECTION] Start With', f'{addr[0]}:{addr[1]}')
             thread.start()
+            self.threads.append(thread)
+
+    def stop_server(self):
+        self.stop_event.set()
+        for thread in self.threads:
+            thread.join()
+        print("All client connections closed")
