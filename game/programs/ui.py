@@ -4,7 +4,7 @@ from config import ConfigFile
 
 
 def show_info(content, pos, side='topleft'):
-    font = pygame.font.SysFont('Liberation Mono', 20)
+    font = pygame.font.SysFont(ConfigFile().get_font_name(), 20)
     text_surface = font.render(str(content), True, (255, 255, 255))
     rect = text_surface.get_rect()
     setattr(rect, side, pos)
@@ -163,7 +163,6 @@ class Input(Shapes):
 
     def get_data(self, data):
         data = self.data.text_str
-
 
 
 class Button(Shapes):
