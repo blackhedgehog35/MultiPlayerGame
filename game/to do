@@ -1,0 +1,11 @@
+SETTINGS/MENU:
+[ ] Make a general function which will allow us to put error pop-ups, for example when the values are not
+ correct for the keys in settings.py, for the moment it just doesn't save but will have to be explained to the user
+ why didn't it save. Do this function for when the server is not responding because the host and/or port
+ is not valid, it will be necessary to indicate this to the user by a pop-up (currently I have put a print() but it is not
+ ideal)
+[ ] Small problem in WaitingRoom because when I leave the window, I cannot delete the thread therefore the thread
+ still runs after the window is deleted, which is probably problematic if I want to create another object
+ ClientNetwork, this would mean that there are several requests sent. For the moment it does not bother because the variables
+ are just forgotten but I'm afraid there are problems at the query level, because I don't know how it works, but in
+ In any case it is not clean.

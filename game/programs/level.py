@@ -7,15 +7,18 @@ from ui import show_info
 
 
 class Level:
-    FPS = ConfigFile().getint('SCREEN--SETTINGS', 'FPS')
+    config_file = ConfigFile()
+    FPS = config_file.getint('SCREEN--SETTINGS', 'FPS')
+    address, port = config_file.get_host()
+    key = config_file.get_key()
 
-    def __init__(self, screen, connection: ClientNetwork):
-        self.conn = connection
+    def __init__(self, screen=None, connection: ClientNetwork = None):
         pygame.init()
-        self.screen = screen
+        self.screen = screen if screen else pygame.display.set_mode(self.config_file.get_screen_size())
+        self.conn = connection if connection else ClientNetwork(self.address, self.port, key=self.key)
         pygame.display.set_caption('')
+
         self.clock = pygame.time.Clock()
-        #  self.sprites = {self.conn.KEY: Player(self.conn.KEY, self.conn.spawn_pos)}
         self.all_sprites = CustomSpriteGroup()
         self.all_sprites.add(Sprite(self.conn.KEY, self.conn.spawn_pos, self.all_sprites))
 
@@ -59,8 +62,8 @@ class Level:
                                                     self.all_sprites.find(self.conn.KEY).rect.y))
             self.update(dt, server_game)
             pygame.display.flip()
+        self.config_file.save_key(self.conn.KEY)
 
 
 if __name__ == '__main__':
-    host, port = ConfigFile().get_host()
-    Level(pygame.display.set_mode(ConfigFile().get_screen_size()), ClientNetwork(host, port)).run()
+    Level().run()
