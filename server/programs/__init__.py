@@ -16,11 +16,7 @@ class Server:
         self.server_socket.bind(('', 0))
 
         self.PORT = self.server_socket.getsockname()[1]
-        try:
-            self.HOST = self.setup_upnp_port_mapping()
-        except Exception:
-            server.programs.function.custom_print('[ERROR]', 'cannot open connection.')
-            sys.exit()
+        self.HOST = self.setup_upnp_port_mapping()
 
         server.programs.function.custom_print("Public IP Address:", self.HOST)
         server.programs.function.custom_print("Public IP Port:", self.PORT)

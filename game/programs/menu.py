@@ -63,7 +63,7 @@ class WaitingRoomToGetConn:
 
     def init_objet(self):
         try:
-            self.conn(self.host, self.port, self.key)
+            self.conn = self.conn(self.host, self.port, self.key)
         except ServerNoFound as e:
             self.error_msg = e.__str__()
             print(self.error_msg)

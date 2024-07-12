@@ -47,16 +47,16 @@ class Level:
         self.all_sprites.custom_draw(self.all_sprites.find(self.conn.KEY))
 
     def run(self):
-        run = True
-        while run:
+        running = True
+        while running:
             dt = self.clock.tick(self.FPS) / 1000
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
                 elif event.type == pygame.KEYDOWN:
-                    if pygame.key.get_pressed()[pygame.K_a]:
-                        run = False
+                    if event.key == pygame.K_ESCAPE:
+                        running = False
 
             server_game = self.conn.send_attribute((self.all_sprites.find(self.conn.KEY).rect.x,
                                                     self.all_sprites.find(self.conn.KEY).rect.y))

@@ -55,6 +55,7 @@ class ClientNetwork:
         self.spawn_pos = None
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.connect()
+        self.connected = True
 
     def connect(self):
         try:
@@ -68,6 +69,7 @@ class ClientNetwork:
             else:
                 self.KEY = server_respond['key']
                 self.spawn_pos = server_respond['pos']
+            self.connected = True
 
         #  Exception when an error with the server appears, for example if the server is not started
         except EOFError:
@@ -101,3 +103,6 @@ class ClientNetwork:
             raise ServerClosed(self.HOST, self.PORT)
         except BrokenPipeError:
             raise ServerClosed(self.HOST, self.PORT)
+
+    def close_connection(self):
+        pass
