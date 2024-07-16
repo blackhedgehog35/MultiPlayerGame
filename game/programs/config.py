@@ -1,5 +1,13 @@
+import os
+import sys
+import pygame
 import configparser
-from os.path import join
+
+
+def close():
+    pygame.quit()
+    sys.exit()
+    os._exit()
 
 
 class Key:
@@ -14,7 +22,7 @@ class Key:
 
 
 class ConfigFile(configparser.ConfigParser):
-    file = join('..', 'config.ini')
+    file = os.path.join('..', 'config.ini')
     key = Key()
 
     def __init__(self):
@@ -29,6 +37,9 @@ class ConfigFile(configparser.ConfigParser):
 
     def get_title_size(self):
         return self.getint('FONT', 'title-size')
+
+    def get_small_size(self):
+        return self.getint('FONT', 'small-size')
 
     def update(self):
         self.read(self.file)

@@ -1,11 +1,25 @@
 SETTINGS/MENU:
-[ ] Make a general function which will allow us to put error pop-ups, for example when the values are not
+[✔] Make a general function which will allow us to put error pop-ups, for example when the values are not
  correct for the keys in settings.py, for the moment it just doesn't save but will have to be explained to the user
  why didn't it save. Do this function for when the server is not responding because the host and/or port
  is not valid, it will be necessary to indicate this to the user by a pop-up (currently I have put a print() but it is not
  ideal)
+[ ] Complete the PopUp class with add an effect when its pop up and pop down
 [ ] Small problem in WaitingRoom because when I leave the window, I cannot delete the thread therefore the thread
  still runs after the window is deleted, which is probably problematic if I want to create another object
  ClientNetwork, this would mean that there are several requests sent. For the moment it does not bother because the variables
  are just forgotten but I'm afraid there are problems at the query level, because I don't know how it works, but in
  In any case it is not clean.
+[ ] We have to add a method in ClientNetwork to close the connection between us and the server. For that, i think that we
+ have to add somethings like "content" and "title" in the message that we sends to the server. When the title will be "close",
+ the server will stop the connection
+[ ] Add a hitbox in Sprite and check collision
+[ ] to considerably increase the FPS, we will have to execute the main loop of the game in parallel with sending the
+ information to the server and restoring it in the game because what makes the game "lag" I think is mainly the fact that
+ the program wait for the server's response to continue but if it works in parallel it could increase the FPS.
+[ ] We need to create a button component which be used in the MainRoom to access to the Game and the Settings.
+[✔️] Remove s when 0 s on the Waiting Room time counter
+[✔] Add a pop up when the delay in the Waiting Room is > to 1 min.
+[✔] Switch the way to go in the WaitingRoom with the Settings.
+[✔] bug on the pop up when a word is too long, it doesn't draw the last word.
+[ ] bug when we want to save the host and the port, idk why but it doesn't works.

@@ -27,7 +27,8 @@ class Level:
 
     def update(self, dt, server_game):
         self.draw_bg()
-        show_info(f'POS : {self.all_sprites.find(self.conn.KEY).pos}', (0, self.screen.get_height()), 'bottomleft')
+        show_info(self.all_sprites.find(self.conn.KEY).pos, (0, self.screen.get_height()), 'bottomleft')
+        show_info(f"{round(self.clock.get_fps())} FPS", (0, 0), 'topleft')
         #  Update the local game with the server
         for key in server_game.keys():
             if key not in [sprite.KEY for sprite in self.all_sprites.sprites()]:
@@ -46,23 +47,26 @@ class Level:
         self.all_sprites.update(dt)
         self.all_sprites.custom_draw(self.all_sprites.find(self.conn.KEY))
 
+    def close(self):
+        self.config_file.save_key(self.conn.KEY)
+        pygame.quit()
+        sys.exit()
+
     def run(self):
         running = True
         while running:
             dt = self.clock.tick(self.FPS) / 1000
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
+                    self.close()
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        running = False
+                        self.close()
 
             server_game = self.conn.send_attribute((self.all_sprites.find(self.conn.KEY).rect.x,
                                                     self.all_sprites.find(self.conn.KEY).rect.y))
             self.update(dt, server_game)
             pygame.display.flip()
-        self.config_file.save_key(self.conn.KEY)
 
 
 if __name__ == '__main__':

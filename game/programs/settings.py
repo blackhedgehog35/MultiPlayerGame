@@ -1,6 +1,6 @@
-import sys
 import pygame
-import config
+from config import ConfigFile, close
+from animations import load_animation
 
 
 class MainContainerGroup(pygame.sprite.Group):
@@ -77,11 +77,86 @@ class MainContainerGroup(pygame.sprite.Group):
         return list_component
 
 
-class Text(pygame.sprite.Sprite):
-    config_file = config.ConfigFile()
-
-    def __init__(self, text, size, color, pos, side='topleft', bold=False):
+class TextGroup(pygame.sprite.Group):
+    def __init__(self, rect: pygame.Rect):
         super().__init__()
+        self.screen = pygame.display.get_surface()
+        #  self.rect = pygame.Rect(icon_rect.right, icon_rect.top, main_rect.width-icon_rect.width-10, icon_rect.height)
+        self.rect = rect
+
+    def get_bottom_pos_last_text(self) -> int:
+        height = self.rect.top
+        for sprite in self.sprites():
+            height = max(height, sprite.rect.bottom)
+        return height
+
+    def set_text(self, *, title: str = None, content: str = None, center=False, text_color="black"):
+
+        if title:
+            total_sentence = []
+            text = None
+            for word in title.split(' '):
+                total_sentence.append(word)
+                text_pos = (self.rect.left, self.get_bottom_pos_last_text())
+                text = Text(" ".join(total_sentence), 20, text_color, text_pos, bold=True)
+
+                if text.rect.right > self.rect.right:
+                    total_sentence.remove(word)
+                    text = Text(" ".join(total_sentence), 20, text_color, text_pos, bold=True)
+                    total_sentence = [word]
+                    self.add(text)
+            self.add(text)
+
+        if content:
+            total_sentence = []
+            for index, word in enumerate(content.split(' ')):
+                total_sentence.append(word)
+                text_pos = (self.rect.left, self.get_bottom_pos_last_text())
+                text = Text(" ".join(total_sentence), 20, text_color, text_pos)
+
+                if text.rect.right > self.rect.right and len(total_sentence) != 1:
+                    total_sentence.remove(word)
+                    text = Text(" ".join(total_sentence), 20, text_color, text_pos)
+                    self.add(text)
+                    total_sentence = [word]
+            if len(total_sentence) != 0:
+                self.add(Text(" ".join(total_sentence), 20, text_color, (self.rect.left,
+                                                                         self.get_bottom_pos_last_text())))
+
+        if center:
+            self.recenter_text()
+
+    def set_transparency(self, transparency):
+        for sprite in self.sprites():
+            sprite.image.set_alpha(transparency)
+
+    def recenter_text(self):
+        top = None
+        bottom = None
+        for sprite in self.sprites():
+            top = min(top, sprite.rect.top) if top else sprite.rect.top
+            bottom = max(bottom, sprite.rect.bottom) if bottom else sprite.rect.bottom
+
+        for sprite in self.sprites():
+            sprite.rect.y += (self.rect.height - (bottom - top)) / 2 - (top - self.rect.top)
+
+    def draw_hitbox(self):
+        pygame.draw.rect(self.screen, "purple", self.rect)
+        for text in self.sprites():
+            pygame.draw.rect(self.screen, "pink", text.rect)
+            text.draw(self.screen)
+
+    def draw_text(self):
+        for text in self.sprites():
+            text.draw(self.screen)
+
+
+class Text(pygame.sprite.Sprite):
+    config_file = ConfigFile()
+
+    def __init__(self, text, size, color, pos=(0, 0), side='topleft', bold=False):
+        super().__init__()
+        self.screen = pygame.display.get_surface()
         self.str = text
 
         self.font = pygame.font.SysFont(self.config_file.get_font_name(), int(size), bold=bold)
@@ -107,12 +182,15 @@ class Text(pygame.sprite.Sprite):
         self.pos.y += offset_y
         setattr(self.rect, self.side, self.pos)
 
-    def draw(self, surface):
-        surface.blit(self.image, self.rect)
+    def draw(self, surface=None):
+        if surface:
+            surface.blit(self.image, self.rect)
+        else:
+            self.screen.blit(self.image, self.rect)
 
 
 class Input(pygame.sprite.Sprite):
-    config_file = config.ConfigFile()
+    config_file = ConfigFile()
     padding = {"between rect and text": {"x": 4, "y": 3}}
     is_writing = False
     border_radius = 5
@@ -216,7 +294,7 @@ class Input(pygame.sprite.Sprite):
 
 
 class OneKeyInput(pygame.sprite.Sprite):
-    config_file = config.ConfigFile()
+    config_file = ConfigFile()
     special_values = {pygame.K_RIGHT: 'right arrow', pygame.K_LEFT: 'left arrow',
                       pygame.K_DOWN: 'down arrow', pygame.K_UP: 'up arrow', pygame.K_SPACE: 'space'}
 
@@ -295,8 +373,89 @@ class OneKeyInput(pygame.sprite.Sprite):
                                       self.rect.bottom - self.padding['between rect and text']['y'])
 
 
+class Icon(pygame.sprite.Sprite):
+    def __init__(self, size, *path):
+        super().__init__()
+        self.screen = pygame.display.get_surface()
+        self.size = size
+        self.image = load_animation(*path).convert_alpha()
+        self.image = pygame.transform.scale(self.image, self.size)
+
+        self.rect = self.image.get_rect()
+
+    def set_transparency(self, transparency):
+        self.image.set_alpha(transparency)
+
+    def draw(self):
+        self.screen.blit(self.image, self.rect)
+
+
+class PopUp(pygame.sprite.Sprite):
+    duration = 7.5*10**3
+    width_total = 610
+
+    def __init__(self):
+        super().__init__()
+        self.screen = pygame.display.get_surface()
+        middle_screen = self.screen.get_width() / 2
+        self.icon_rect = pygame.Rect(0, 0, 80, 80)
+        self.content_rect = pygame.Rect(0, 0, self.width_total - 110, 80)
+
+        self.main_rect = pygame.Rect(0, 0, self.width_total, 100)
+        self.main_rect.midtop = (middle_screen, 30)
+
+        self.icon_rect.midleft = (self.main_rect.x + 10, self.main_rect.centery)
+        self.content_rect.midleft = (self.icon_rect.right + 10, self.icon_rect.centery)
+
+        self.icon: Icon = None
+        self.text_group: TextGroup = None
+
+        self.surface = pygame.Surface(self.main_rect.size, pygame.SRCALPHA)
+        self.active = False
+        self.start_time = None
+
+    def notify(self, *, icon_type="error", title=None, body=None, text_center=True, text_color="black"):
+        self.icon = Icon((self.icon_rect.width - 20, self.icon_rect.height - 20), "icons", f"{icon_type}.png")
+        self.icon.rect.center = self.icon_rect.center
+
+        self.text_group = TextGroup(self.content_rect)
+        self.text_group.set_text(title=title, content=body, center=text_center, text_color=text_color)
+        self.active = True
+        self.start_time = pygame.time.get_ticks()
+
+    def __set_transparency(self, transparency):
+        """Set the transparency of the notification.
+
+        Args:
+            transparency (int): The transparency level from 0 to 255.
+        """
+        self.surface.set_alpha(transparency)
+        self.text_group.set_transparency(transparency)
+        self.icon.set_transparency(transparency)
+
+    def __draw_bg(self):
+        pygame.draw.rect(self.surface, "white", self.surface.get_rect(), border_radius=15)
+        self.screen.blit(self.surface, self.main_rect.topleft)
+
+    def __update(self):
+        current_time = pygame.time.get_ticks()
+        if self.active:
+            if (current_time - self.start_time >= self.duration and
+                    not self.main_rect.collidepoint(pygame.mouse.get_pos())):
+                self.active = False
+
+    def draw(self):
+        self.__update()
+        if self.active:
+            self.__draw_bg()
+        if self.text_group and self.active:
+            self.text_group.draw_text()
+        if self.icon and self.active:
+            self.icon.draw()
+
+
 class Settings:
-    config_file = config.ConfigFile()
+    config_file = ConfigFile()
     FPS = config_file.getint('SCREEN--SETTINGS', 'FPS')
     screen_size = config_file.get_screen_size()
     #  Container : Top, left, right
@@ -317,7 +476,7 @@ class Settings:
         self.clock = pygame.time.Clock()
         self.get_settings_sections()
         self.main_container_group = MainContainerGroup(self.main_container, self.margin)
-
+        self.pop_up = PopUp()
         for section in self.get_settings_sections():
             self.add_section(section)
 
@@ -378,15 +537,12 @@ class Settings:
             self.main_container_group.add(_input)
 
     def save(self):
-        if self.verify_input_values():
-            for input_component in self.main_container_group.inputs():
-                section, option = input_component.id.split("|")
-                self.config_file.edit_value(section, option, input_component.text.str)
-            for input_key in self.main_container_group.input_key():
-                section, option = input_key.id.split("|")
-                self.config_file.edit_value(section, option, str(input_key.value))
-        else:
-            print("Values Not Correct")
+        for input_component in self.main_container_group.inputs():
+            section, option = input_component.id.split("|")
+            self.config_file.edit_value(section, option, input_component.text.str)
+        for input_key in self.main_container_group.input_key():
+            section, option = input_key.id.split("|")
+            self.config_file.edit_value(section, option, str(input_key.value))
 
     def verify_input_values(self) -> bool:
         #  I'm going to check a little by hand if each value of the inputs is respected, so for that I'm going to do
@@ -444,15 +600,19 @@ class Settings:
             self.draw_bg()
 
             _dt = self.clock.tick(self.FPS) / 1000
-
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self.save()
-                    pygame.quit()
-                    sys.exit()
+                    close()
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        running = False
+                        if self.verify_input_values():
+                            running = False
+                        else:
+                            if not self.pop_up.active:
+                                self.pop_up.notify(icon_type='error', title="Warning",
+                                                   body="One or more values are not correct, please correct them.")
+                            else:
+                                running = False
                     else:
                         for component in self.main_container_group.sprites():
                             if isinstance(component, Input):
@@ -467,11 +627,15 @@ class Settings:
 
             self.main_container_group.custom_selector()
             self.main_container_group.custom_draw()
+            self.pop_up.draw()
             # Update the display
             pygame.display.flip()
 
-        self.save()
+        if self.verify_input_values():
+            self.save()
+        else:
+            pass
 
 
 if __name__ == '__main__':
-    Settings(pygame.display.set_mode(config.ConfigFile().get_screen_size())).run()
+    Settings(pygame.display.set_mode(ConfigFile().get_screen_size())).run()

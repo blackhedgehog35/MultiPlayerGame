@@ -34,30 +34,43 @@ class Server:
 
     def client_connection(self, client_socket, addr):
         #  Start of the connection with the client
-        client_conn = server.programs.client.ClientConn(client_socket, addr, self.world)
-        self.world[client_conn.KEY] = {'online': True, 'pos': client_conn.pos}
-        while True:
-            try:
-                message = pickle.loads(client_socket.recv(1024))
-            except EOFError:
-                break
-            except ConnectionResetError:
-                break
-            for attribute in message.keys():
-                self.world[client_conn.KEY][attribute] = message[attribute]
-            client_conn.send(self.world)
-
-        client_conn.socket.close()
-        self.world[client_conn.KEY]['online'] = False
-        server.programs.function.custom_print('[CONNECTION] End With', f'{client_conn.address_ip}:{client_conn.port}')
+        try:
+            client_conn = server.programs.client.ClientConn(client_socket, addr, self.world)
+        except AttributeError:
+            pass
+        else:
+            while True:
+                try:
+                    message = pickle.loads(client_socket.recv(1024))
+                except EOFError:
+                    break
+                except ConnectionResetError:
+                    break
+                else:
+                    for attribute in message.keys():
+                        self.world[client_conn.KEY][attribute] = message[attribute]
+                    client_conn.send(self.world)
+            self.world[client_conn.KEY] = {'online': True, 'pos': client_conn.pos}
+            client_conn.socket.close()
+            self.world[client_conn.KEY]['online'] = False
+        finally:
+            server.programs.function.custom_print('[CONNECTION] End With',
+                                                  f'{addr[0]}:{addr[1]}')
 
     def input_server(self):
         while True:
             message = input('')
             if message.lower() in ['world', 'echo', 'print']:
                 print(self.world)
-            elif message.lower() in ['test']:
-                self.stop_server()
+            elif message.lower() in ['reset']:
+                new_world = {}
+                for key in self.world.keys():
+                    if self.world[key]['online']:
+                        new_world[key] = self.world[key]
+                print(f'{self.world} ==> {new_world}')
+                self.world = new_world
+            else:
+                print("Don't understand the command.")
 
     def start(self):
         self.server_socket.listen()
@@ -72,9 +85,3 @@ class Server:
             server.programs.function.custom_print('[CONNECTION] Start With', f'{addr[0]}:{addr[1]}')
             thread.start()
             self.threads.append(thread)
-
-    def stop_server(self):
-        self.stop_event.set()
-        for thread in self.threads:
-            thread.join()
-        print("All client connections closed")
