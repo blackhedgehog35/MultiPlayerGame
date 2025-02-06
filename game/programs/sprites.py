@@ -52,6 +52,7 @@ class CustomSpriteGroup(pygame.sprite.Group):
             sprite.draw(offset_pos)
 
 
+
 class Sprite(pygame.sprite.Sprite):
     config_file = ConfigFile()
     #  This is the margin to obtain the player's position, because in a 2d game viewed from height, the positions are
@@ -63,7 +64,7 @@ class Sprite(pygame.sprite.Sprite):
     depht = 5
     hitbox_w = w - 5
 
-    def __init__(self, key, start_pos, group):
+    def __init__(self, key, start_pos, group, weapon =False):
         self.KEY = key
         super().__init__(group)
 
@@ -80,6 +81,10 @@ class Sprite(pygame.sprite.Sprite):
         self.hitbox = pygame.Rect(0, 0, self.hitbox_w, self.depht)
         x, y = self.rect.centerx, self.rect.bottom + self.hitbox.height / 3
         self.hitbox.midbottom = (x, y)
+
+        # theorically the weapon depends on the image you choose so maybe we'll need dictionnary
+        # to get the weapon depending on the image
+        self.weapon = weapon
 
     def input(self):
         keys = pygame.key.get_pressed()
@@ -134,3 +139,35 @@ class Sprite(pygame.sprite.Sprite):
 
     def set_attribute(self, current_position):
         self.pos.x, self.pos.y = current_position
+
+    def attack(self):
+        if self.weapon.check_can_attack():
+            pass
+
+    # method to get all the sprites this sprite can hit
+    def get_sprites_attackable(self):
+        attackable_sprites = []
+        # I need a list of all the sprites around the sprite and then according to the shape
+        # of the line of sight of the weapon
+        return attackable_sprites
+
+
+class Weapon:
+
+    def __init__(self, damage: int, range: int, loading_time: int, line_sight_shape):
+        self.damage = damage
+        self.range = range
+        self.line_sight_shape = line_sight_shape
+        self.time = 0
+        self.loading_time = loading_time
+
+    # we don't need any display method because the image is supported by the image of the character
+
+    def check_can_attack(self):
+        return self.time == self.loading_time
+
+    # method to display the line of sight, maybe we'll need to put it into the sprite class
+    def display_line_sight(self):
+        pass
+
+
