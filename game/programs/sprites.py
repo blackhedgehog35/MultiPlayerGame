@@ -53,6 +53,27 @@ class CustomSpriteGroup(pygame.sprite.Group):
 
 
 
+
+class Weapon:
+
+    def __init__(self, damage: int, range: int, loading_time: int, line_sight_shape):
+        self.damage = damage
+        self.range = range
+        self.line_sight_shape = line_sight_shape
+        self.time = 0
+        self.loading_time = loading_time
+
+    # we don't need any display method because the image is supported by the image of the character
+
+    def check_can_attack(self):
+        return self.time == self.loading_time
+
+    # method to display the line of sight, maybe we'll need to put it into the sprite class
+    def display_line_sight(self):
+        pass
+
+
+
 class Sprite(pygame.sprite.Sprite):
     config_file = ConfigFile()
     #  This is the margin to obtain the player's position, because in a 2d game viewed from height, the positions are
@@ -64,7 +85,7 @@ class Sprite(pygame.sprite.Sprite):
     depht = 5
     hitbox_w = w - 5
 
-    def __init__(self, key, start_pos, group, weapon =False):
+    def __init__(self, key, start_pos, group, weapon:Weapon):
         self.KEY = key
         super().__init__(group)
 
@@ -85,6 +106,7 @@ class Sprite(pygame.sprite.Sprite):
         # theorically the weapon depends on the image you choose so maybe we'll need dictionnary
         # to get the weapon depending on the image
         self.weapon = weapon
+        self.health = 200
 
     def input(self):
         keys = pygame.key.get_pressed()
@@ -140,9 +162,9 @@ class Sprite(pygame.sprite.Sprite):
     def set_attribute(self, current_position):
         self.pos.x, self.pos.y = current_position
 
-    def attack(self):
-        if self.weapon.check_can_attack():
-            pass
+    def damage(self, amount: int):
+        self.health -= amount
+        # we'll need an animation here
 
     # method to get all the sprites this sprite can hit
     def get_sprites_attackable(self):
@@ -151,23 +173,9 @@ class Sprite(pygame.sprite.Sprite):
         # of the line of sight of the weapon
         return attackable_sprites
 
-
-class Weapon:
-
-    def __init__(self, damage: int, range: int, loading_time: int, line_sight_shape):
-        self.damage = damage
-        self.range = range
-        self.line_sight_shape = line_sight_shape
-        self.time = 0
-        self.loading_time = loading_time
-
-    # we don't need any display method because the image is supported by the image of the character
-
-    def check_can_attack(self):
-        return self.time == self.loading_time
-
-    # method to display the line of sight, maybe we'll need to put it into the sprite class
-    def display_line_sight(self):
-        pass
+    def attack(self):
+        if self.weapon.check_can_attack():
+            for sprite in self.get_sprites_attackable():
+                sprite.damage(self.weapon.damage)
 
 
